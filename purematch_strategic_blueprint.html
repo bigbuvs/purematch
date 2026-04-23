@@ -1,0 +1,282 @@
+
+<h2 class="sr-only">PureMatch MVP — Blueprint estratégico completo con 20 secciones: definición, hipótesis, journey, funcionalidades, fases, stack, copy y recomendaciones UX.</h2>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.doc{font-family:var(--font-sans,sans-serif);padding:0 0 2rem}
+.sec{margin-bottom:2rem}
+.sec-hdr{display:flex;align-items:center;gap:10px;margin-bottom:.75rem;padding-bottom:8px;border-bottom:.5px solid var(--color-border-tertiary)}
+.sec-num{width:24px;height:24px;border-radius:50%;background:var(--color-background-info);color:var(--color-text-info);font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sec-ttl{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.card{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg,12px);padding:.875rem 1rem;margin-bottom:8px}
+.c-info{background:var(--color-background-info);border:.5px solid var(--color-border-info);border-radius:var(--border-radius-lg,12px);padding:.875rem 1rem;margin-bottom:8px}
+.c-warn{background:var(--color-background-warning);border:.5px solid var(--color-border-warning);border-radius:var(--border-radius-lg,12px);padding:.875rem 1rem;margin-bottom:8px}
+.c-ok{background:var(--color-background-success);border:.5px solid var(--color-border-success);border-radius:var(--border-radius-lg,12px);padding:.875rem 1rem;margin-bottom:8px}
+.c-err{background:var(--color-background-danger);border:.5px solid var(--color-border-danger);border-radius:var(--border-radius-lg,12px);padding:.875rem 1rem;margin-bottom:8px}
+.lbl{font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--color-text-secondary);margin-bottom:3px}
+.lbl-info{font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--color-text-info);margin-bottom:3px}
+.lbl-ok{font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--color-text-success);margin-bottom:3px}
+.lbl-warn{font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--color-text-warning);margin-bottom:3px}
+.lbl-err{font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--color-text-danger);margin-bottom:3px}
+.body{font-size:13px;color:var(--color-text-primary);line-height:1.65}
+.muted{font-size:13px;color:var(--color-text-secondary);line-height:1.65}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:8px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:8px}
+.metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md,8px);padding:10px 12px}
+.mval{font-size:20px;font-weight:500;color:var(--color-text-primary);margin-top:3px}
+.step{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:.5px solid var(--color-border-tertiary)}
+.step:last-child{border-bottom:none}
+.snum{width:26px;height:26px;border-radius:50%;background:var(--color-background-secondary);color:var(--color-text-secondary);font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.snum.hi{background:var(--color-background-info);color:var(--color-text-info)}
+.snum.ok{background:var(--color-background-success);color:var(--color-text-success)}
+.stitle{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.sdesc{font-size:12px;color:var(--color-text-secondary);margin-top:2px;line-height:1.5}
+.scr{background:var(--color-background-secondary);border-radius:var(--border-radius-md,8px);padding:9px 12px;margin-bottom:6px}
+.scr-t{font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.scr-d{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+.ph{font-size:12px;font-weight:500;padding:6px 10px;border-radius:var(--border-radius-md,8px);margin-bottom:6px}
+.ph0{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.ph1{background:var(--color-background-info);color:var(--color-text-info)}
+.ph2{background:var(--color-background-success);color:var(--color-text-success)}
+.copy{background:var(--color-background-secondary);border-left:3px solid var(--color-border-info);border-radius:0 var(--border-radius-md,8px) var(--border-radius-md,8px) 0;padding:9px 12px;margin-bottom:6px}
+.copy-l{font-size:11px;color:var(--color-text-secondary);margin-bottom:3px}
+.copy-t{font-size:13px;color:var(--color-text-primary);font-style:italic;line-height:1.6}
+.hdr-hero{padding:1.25rem 0 .75rem;display:flex;align-items:center;gap:10px;margin-bottom:.5rem}
+.logo-box{width:34px;height:34px;border-radius:8px;background:var(--color-background-info);display:flex;align-items:center;justify-content:center;font-size:16px}
+</style>
+<div class="doc">
+<div class="hdr-hero">
+  <div class="logo-box" style="font-size:16px;color:var(--color-text-info);">P</div>
+  <div>
+    <div style="font-size:18px;font-weight:500;color:var(--color-text-primary)">PureMatch — Blueprint MVP</div>
+    <div style="font-size:12px;color:var(--color-text-secondary)">Documento estratégico · 20 secciones · v1.0</div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">1</div><div class="sec-ttl">Definición exacta del MVP funcional</div></div>
+  <div class="c-info">
+    <div class="lbl-info">Una línea</div>
+    <div class="body">Plataforma web que conecta dueños de perros con pedigree en Chile mediante perfiles validados documentalmente, permitiendo encontrar un match compatible y desbloquear el contacto solo cuando ambas partes están verificadas.</div>
+  </div>
+  <div class="g3">
+    <div class="metric"><div class="lbl">Núcleo</div><div class="mval" style="font-size:13px;margin-top:4px">Matching + validación</div></div>
+    <div class="metric"><div class="lbl">Monetización</div><div class="mval" style="font-size:13px;margin-top:4px">Desbloqueo de contacto</div></div>
+    <div class="metric"><div class="lbl">Canal</div><div class="mval" style="font-size:13px;margin-top:4px">Web app responsive</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">2</div><div class="sec-ttl">Objetivo de aprendizaje del MVP</div></div>
+  <div class="card">
+    <div class="body" style="margin-bottom:6px">Descubrir si el segmento sube perfiles, completa la validación documental y <strong style="font-weight:500">paga por desbloquear un contacto</strong> dentro de las primeras 4 semanas de uso.</div>
+    <div class="muted">Si nadie completa la validación o nadie paga, el problema no es el canal ni el diseño — es que la hipótesis central estaba equivocada.</div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">3</div><div class="sec-ttl">Hipótesis a validar</div></div>
+  <div class="g2">
+    <div class="c-info">
+      <div class="lbl-info">Hipótesis principal</div>
+      <div class="body">Los criadores responsables pagarán por acceder al contacto de un perfil validado antes que aceptar un contacto sin verificar.</div>
+    </div>
+    <div class="card">
+      <div class="lbl">Hipótesis secundaria</div>
+      <div class="body">Los usuarios sí completan la carga documental si entienden que validarse les da acceso a mejores matches.</div>
+    </div>
+  </div>
+  <div class="c-warn">
+    <div class="lbl-warn">Hipótesis de riesgo</div>
+    <div class="body">Los usuarios quieren el contacto directo y no valorarán pagar por algo que hoy consiguen gratis, aunque con fricciones e incertidumbre.</div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">4</div><div class="sec-ttl">Perfil de usuario inicial</div></div>
+  <div class="g2">
+    <div class="card">
+      <div class="lbl-info">Persona A — La criadora responsable</div>
+      <div class="muted" style="margin-top:6px">Tiene 1–3 perras de cría registradas en KCC. Tuvo malas experiencias con machos no verificados. 30–50 años, RM oriente, ABC1–C2. Alta intención de pago.</div>
+    </div>
+    <div class="card">
+      <div class="lbl-ok">Persona B — El dueño ocasional</div>
+      <div class="muted" style="margin-top:6px">Tiene un macho con pedigree que quiere reproducir responsablemente. No es criador profesional. 28–45 años, RM. Puede pagar si entiende el valor.</div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">5</div><div class="sec-ttl">User journey principal</div></div>
+  <div class="card">
+    <div class="step"><div class="snum hi">1</div><div><div class="stitle">Descubrimiento</div><div class="sdesc">Llega por referido, Instagram o Google. Ve el claim principal y se registra con email en menos de 2 min.</div></div></div>
+    <div class="step"><div class="snum hi">2</div><div><div class="stitle">Registro del perro</div><div class="sdesc">Nombre, raza, edad, sexo, fotos, descripción. Sube certificado de pedigree KCC + carnet de vacunas.</div></div></div>
+    <div class="step"><div class="snum">3</div><div><div class="stitle">Espera de validación</div><div class="sdesc">Admin revisa los documentos manualmente (24–48h). Usuario recibe email con resultado. Estado visible en perfil.</div></div></div>
+    <div class="step"><div class="snum hi">4</div><div><div class="stitle">Exploración de matches</div><div class="sdesc">Ve perfiles compatibles (raza, tamaño, zona). Puede ver foto, descripción e indicador de validación. El contacto está oculto.</div></div></div>
+    <div class="step"><div class="snum">5</div><div><div class="stitle">Solicitud de match</div><div class="sdesc">Usuario A envía solicitud. Usuario B acepta o rechaza. Sin costo en este paso.</div></div></div>
+    <div class="step"><div class="snum ok">6</div><div><div class="stitle">Desbloqueo pagado — momento de monetización</div><div class="sdesc">Si ambos aceptaron y ambos están validados, cualquiera puede pagar ($9.990 CLP) para revelar el contacto del otro. Este es el núcleo del negocio.</div></div></div>
+    <div class="step"><div class="snum">7</div><div><div class="stitle">Contacto fuera de plataforma</div><div class="sdesc">Coordinan por WhatsApp o llamada. PureMatch no interviene en V1. Mensajería interna queda para V2.</div></div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">6–8</div><div class="sec-ttl">Funcionalidades: obligatorias, deseables y fuera del MVP</div></div>
+  <div class="g2">
+    <div class="c-ok">
+      <div class="lbl-ok">Obligatorias (MVP duro)</div>
+      <div class="muted" style="margin-top:6px;line-height:1.8">
+        Registro con email · Perfil de usuario · Registro del perro · Carga de documentos (PDF/JPG) · Estado de validación visible · Listado de perfiles compatibles · Filtros: raza, tamaño, sector RM · Solicitud y aceptación de match · Desbloqueo de contacto con pago web · Panel admin para validación manual
+      </div>
+    </div>
+    <div class="c-warn">
+      <div class="lbl-warn">Deseables pero no críticas (V1+)</div>
+      <div class="muted" style="margin-top:6px;line-height:1.8">
+        Mensajería interna · Notificaciones push · Historial de cruzas · Rating y reviews · Compartir perfil por link · Múltiples perros por usuario · Mapa geolocalizado · Recordatorio de celos
+      </div>
+    </div>
+  </div>
+  <div class="c-err">
+    <div class="lbl-err">Fuera del MVP — no construir ahora</div>
+    <div class="muted" style="margin-top:4px">Integración API KCC · Validación automática OCR · Algoritmo genético · Firma electrónica avanzada · App nativa iOS/Android · Pasarela de pago propia · Red social / feed / likes · Certificado de cruza digital</div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">9</div><div class="sec-ttl">Flujo de pantallas del MVP</div></div>
+  <div class="g2">
+    <div>
+      <div class="scr"><div class="scr-t">P1 — Landing</div><div class="scr-d">Hero con claim + CTA "Registra tu perro" · 3 pilares: Validación, Matching, Confianza · Footer legal</div></div>
+      <div class="scr"><div class="scr-t">P2 — Registro / login</div><div class="scr-d">Email + contraseña · Google OAuth opcional · Sin formularios largos</div></div>
+      <div class="scr"><div class="scr-t">P3 — Onboarding (2 pasos)</div><div class="scr-d">Paso 1: datos del dueño (nombre, zona RM, teléfono oculto) · Paso 2: datos del perro (nombre, raza, sexo, edad, fotos)</div></div>
+      <div class="scr"><div class="scr-t">P4 — Carga de documentos</div><div class="scr-d">Upload pedigree KCC (PDF/JPG) · Carnet vacunas · Doc identidad dueño (RUT) · Estado: "En revisión"</div></div>
+      <div class="scr"><div class="scr-t">P5 — Mi perfil</div><div class="scr-d">Badge de validación (pendiente / validado / rechazado) · Datos del perro · Documentos cargados · Editar información</div></div>
+    </div>
+    <div>
+      <div class="scr"><div class="scr-t">P6 — Explorar matches</div><div class="scr-d">Cards de perfiles compatibles (foto, raza, zona) · Badge "Perfil validado" visible · Filtros activos · Contacto oculto</div></div>
+      <div class="scr"><div class="scr-t">P7 — Detalle de perfil</div><div class="scr-d">Foto perro · Nombre · Descripción · "Verificado" o "Sin verificar" · Botón "Solicitar match" · Contacto bloqueado</div></div>
+      <div class="scr"><div class="scr-t">P8 — Mis matches</div><div class="scr-d">Lista de solicitudes enviadas y recibidas · Estado: pendiente / aceptado / rechazado · Si aceptado: "Desbloquear contacto"</div></div>
+      <div class="scr"><div class="scr-t">P9 — Paywall de desbloqueo</div><div class="scr-d">Resumen del match · Precio $9.990 CLP · Webpay o Mercado Pago · Tras pago: revela email + teléfono</div></div>
+      <div class="scr"><div class="scr-t">P10 — Admin backoffice</div><div class="scr-d">Lista de perfiles con docs pendientes · Ver documentos · Aprobar/Rechazar + nota · Email automático al usuario</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">10</div><div class="sec-ttl">Arquitectura simple del producto</div></div>
+  <div class="g2">
+    <div class="card"><div class="lbl">Frontend</div><div class="muted" style="margin-top:4px">Next.js 14 · React · TypeScript · Tailwind CSS · Deploy en Vercel</div></div>
+    <div class="card"><div class="lbl">Backend y auth</div><div class="muted" style="margin-top:4px">Supabase (PostgreSQL + Auth + Storage) · API Routes en Next.js</div></div>
+    <div class="card"><div class="lbl">Pagos (Chile)</div><div class="muted" style="margin-top:4px">Transbank Webpay Plus · Fallback: Mercado Pago Chile</div></div>
+    <div class="card"><div class="lbl">Email transaccional</div><div class="muted" style="margin-top:4px">Resend + React Email para templates de marca</div></div>
+    <div class="card"><div class="lbl">Imágenes y documentos</div><div class="muted" style="margin-top:4px">Cloudinary para fotos de perros · Supabase Storage privado para docs sensibles</div></div>
+    <div class="card"><div class="lbl">Panel admin</div><div class="muted" style="margin-top:4px">Retool (rápido de montar) o ruta protegida propia en Next.js</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">11</div><div class="sec-ttl">Lógica del desbloqueo de contacto pagado</div></div>
+  <div class="card">
+    <div class="step"><div class="snum">1</div><div><div class="stitle">Condición previa</div><div class="sdesc">Ambos perfiles deben tener estado de validación = "aprobado". Si alguno no está validado, el botón no aparece y se muestra mensaje explicativo.</div></div></div>
+    <div class="step"><div class="snum">2</div><div><div class="stitle">Match mutuo confirmado</div><div class="sdesc">Ambos usuarios deben haber aceptado la solicitud. No se puede pagar para ver el contacto de alguien que no aceptó.</div></div></div>
+    <div class="step"><div class="snum ok">3</div><div><div class="stitle">Pago único por match</div><div class="sdesc">Cualquiera de los dos puede pagar. Una sola compra desbloquea el contacto para ambas partes. Precio MVP: $9.990 CLP. Testear con $4.990 en piloto.</div></div></div>
+    <div class="step"><div class="snum ok">4</div><div><div class="stitle">Revelación de datos</div><div class="sdesc">Se muestra email del otro usuario + número de teléfono. No hay mensajería interna en V1. El contacto ocurre fuera de la plataforma.</div></div></div>
+    <div class="step"><div class="snum">5</div><div><div class="stitle">Registro de transacción</div><div class="sdesc">Se guarda en BD: quién pagó, qué match, cuándo, monto. Base para métricas y facturación futura.</div></div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">12</div><div class="sec-ttl">Qué puede resolverse manualmente al inicio</div></div>
+  <div class="g2">
+    <div class="c-warn">
+      <div class="lbl-warn">Manual OK (0–100 usuarios)</div>
+      <div class="muted" style="margin-top:4px;line-height:1.8">Revisión de documentos vía panel admin · Envío de email de validación manual · Soporte por WhatsApp Business · Resolución de conflictos caso a caso · Onboarding guiado 1:1 con primeros 20 usuarios</div>
+    </div>
+    <div class="card">
+      <div class="lbl">Automatizar desde día 1</div>
+      <div class="muted" style="margin-top:4px;line-height:1.8">Flujo de pago y desbloqueo · Emails transaccionales · Cambio de estado de validación · Notificación de nuevo match</div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">13</div><div class="sec-ttl">Cómo medir si el MVP funcionó</div></div>
+  <div class="g3">
+    <div class="metric"><div class="lbl">Activación</div><div class="mval">&gt;60%</div><div class="muted" style="font-size:11px;margin-top:3px">Usuarios que completan registro del perro</div></div>
+    <div class="metric"><div class="lbl">Validación</div><div class="mval">&gt;40%</div><div class="muted" style="font-size:11px;margin-top:3px">Perfiles que cargan todos los documentos</div></div>
+    <div class="metric"><div class="lbl">Conversión</div><div class="mval">&gt;10%</div><div class="muted" style="font-size:11px;margin-top:3px">Matches aceptados que terminan en pago</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="lbl-ok">Señales positivas</div><div class="muted" style="margin-top:4px">Alguien paga en la primera semana · Usuarios vuelven a explorar sin ser notificados · Preguntan por más razas o funciones futuras</div></div>
+    <div class="card"><div class="lbl-err">Señales de alarma</div><div class="muted" style="margin-top:4px">Nadie sube documentos · Matches aceptados pero nadie paga · Usuarios piden el contacto por otro canal</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">14</div><div class="sec-ttl">Riesgos principales del MVP</div></div>
+  <div class="c-err">
+    <div class="lbl-err">Alto riesgo</div>
+    <div class="body" style="margin-top:4px"><strong style="font-weight:500">Fricción documental:</strong> Los usuarios no quieren subir RUT ni documentos por desconfianza o pereza.<br><span class="muted">Mitigación: explicar el beneficio antes del formulario. Mostrar el escudo de "perfil verificado" como ventaja visible.</span></div>
+    <div class="body" style="margin-top:8px"><strong style="font-weight:500">Masa crítica inicial:</strong> Sin suficientes perfiles, nadie encuentra matches y se va.<br><span class="muted">Mitigación: lanzar con un grupo curado de 30–50 criadores conocidos antes del lanzamiento público.</span></div>
+  </div>
+  <div class="c-warn">
+    <div class="lbl-warn">Riesgo medio</div>
+    <div class="muted" style="margin-top:4px"><strong style="font-weight:500;color:var(--color-text-primary)">Fraude documental:</strong> Alguien sube un pedigree falso. Mitigación: revisión manual estricta y política de ban permanente. En V2 cruzar con base KCC.<br><br><strong style="font-weight:500;color:var(--color-text-primary)">Percepción de precio:</strong> $9.990 puede parecer caro para el valor percibido. Testear $4.990 en el piloto y medir elasticidad.</div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">15</div><div class="sec-ttl">Recomendaciones UX/UI — seguridad, confianza y exclusividad</div></div>
+  <div class="g2">
+    <div class="card"><div class="lbl">Paleta y estética</div><div class="muted" style="margin-top:4px">Verde oscuro, crema y dorado opaco. Tipografía serif para la marca. Sans neutro para UI. Sin ilustraciones cartoon. Fotos reales de perros de alta calidad. Sin emojis de cachorros.</div></div>
+    <div class="card"><div class="lbl">Señales de confianza</div><div class="muted" style="margin-top:4px">Badge "Perfil verificado" con ícono de escudo. Mostrar qué documentos fueron revisados. Fecha de última validación. Nunca ocultar el proceso — mostrarlo como ventaja diferencial.</div></div>
+    <div class="card"><div class="lbl">Exclusividad responsable</div><div class="muted" style="margin-top:4px">No llamarlo "app de citas". Copy en tono de registro veterinario. Mostrar número de perfiles validados (social proof de calidad, no de cantidad).</div></div>
+    <div class="card"><div class="lbl">Paywall como protección</div><div class="muted" style="margin-top:4px">El desbloqueo debe sentirse como seguridad, no como barrera. Texto antes de pagar: "Solo se cobra cuando ambos perfiles han sido verificados". Transparencia = confianza.</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">16</div><div class="sec-ttl">Plan de desarrollo por fases</div></div>
+  <div class="ph ph0">Versión 0 — Concierge MVP (semanas 1–4)</div>
+  <div class="card" style="margin-bottom:12px"><div class="muted">Sin código propio. Landing estática (Framer/Webflow) + Typeform para registro. Validación de documentos por email. Matching manual por el fundador. Pago por transferencia bancaria. Objetivo: validar si alguien completa el proceso y paga.</div></div>
+  <div class="ph ph1">Versión 1 — Web app funcional (semanas 5–14)</div>
+  <div class="card" style="margin-bottom:12px"><div class="muted">Todo el flujo técnico descrito en este blueprint. 50–200 usuarios piloto. Registro, validación, matching, desbloqueo con Webpay, panel admin, emails transaccionales. Objetivo: medir conversión real a pago.</div></div>
+  <div class="ph ph2">Versión 2 — Crecimiento y confianza (mes 4–9)</div>
+  <div class="card"><div class="muted">Mensajería interna · Historial de cruzas · Reviews verificados · Múltiples perros por usuario · Integración KCC si es posible · Expansión a otras razas y zonas · Plan de suscripción mensual para criadores activos.</div></div>
+</div>
+
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">17</div><div class="sec-ttl">Stack tecnológico recomendado</div></div>
+  <div class="g2">
+    <div class="card"><div class="lbl">Frontend + Deploy</div><div class="muted" style="margin-top:4px">Next.js 14 · React · TypeScript · Tailwind CSS · Vercel</div></div>
+    <div class="card"><div class="lbl">Backend, auth y BD</div><div class="muted" style="margin-top:4px">Supabase (PostgreSQL + Auth + Storage + realtime)</div></div>
+    <div class="card"><div class="lbl">Pagos Chile</div><div class="muted" style="margin-top:4px">Transbank Webpay Plus SDK · Fallback Mercado Pago CL</div></div>
+    <div class="card"><div class="lbl">Email</div><div class="muted" style="margin-top:4px">Resend · React Email para templates de marca</div></div>
+    <div class="card"><div class="lbl">Imágenes</div><div class="muted" style="margin-top:4px">Cloudinary (fotos perros) · Supabase Storage privado (documentos)</div></div>
+    <div class="card"><div class="lbl">Admin</div><div class="muted" style="margin-top:4px">Retool (rápido) o panel propio en Next.js con ruta /admin protegida por rol</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">19</div><div class="sec-ttl">Copy base de onboarding y mensajes clave</div></div>
+  <div class="copy"><div class="copy-l">Hero / claim principal</div><div class="copy-t">"La plataforma donde los perros con pedigree encuentran su mejor match. Solo perfiles verificados. Solo contactos de confianza."</div></div>
+  <div class="copy"><div class="copy-l">Onboarding — paso documentos</div><div class="copy-t">"Para proteger a tu perro y a los demás, verificamos tu identidad y los documentos de tu mascota. Es un proceso de 24–48 horas. Solo tú y los matches que aceptes verán tu información de contacto."</div></div>
+  <div class="copy"><div class="copy-l">Estado: perfil en revisión</div><div class="copy-t">"Tus documentos están en revisión. Te notificaremos por email en menos de 48 horas. Mientras tanto, puedes explorar perfiles y ver quién podría ser el match indicado."</div></div>
+  <div class="copy"><div class="copy-l">Paywall — antes del pago</div><div class="copy-t">"Ambos perfiles están verificados y mutuamente aceptados. Desbloquea el contacto para comenzar la conversación. Este es el único cobro del proceso."</div></div>
+  <div class="copy"><div class="copy-l">Contacto revelado</div><div class="copy-t">"¡Listo! Ya puedes contactarte directamente. Recuerda coordinar la cita veterinaria previa y acordar las condiciones de la cruza por escrito."</div></div>
+  <div class="copy"><div class="copy-l">Perfil sin validar (contacto bloqueado)</div><div class="copy-t">"Este perfil aún no está verificado. PureMatch solo permite el contacto entre perfiles con documentación revisada. Así protegemos a todos."</div></div>
+</div>
+
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">20</div><div class="sec-ttl">Cómo hacer que el MVP se vea serio y premium sin exagerar</div></div>
+  <div class="g2">
+    <div class="c-ok">
+      <div class="lbl-ok">Hacer</div>
+      <div class="muted" style="margin-top:4px;line-height:1.8">Mostrar solo cuántos perfiles están actualmente validados · Política de privacidad y términos reales desde día 1 · Email corporativo @purematch.cl · Fotos de perros reales, nunca stock · Proceso de validación explicado en detalle · "Revisado por equipo PureMatch" en perfiles aprobados</div>
+    </div>
+    <div class="c-err">
+      <div class="lbl-err">No hacer</div>
+      <div class="muted" style="margin-top:4px;line-height:1.8">Inventar métricas que no existen · Prometer funciones no construidas · Fotos de stock genéricas de cachorros · Llamarlo "app" si es solo web · Mostrar "500+ criadores" si hay 20 · Copiar la estética de Tinder con patas</div>
+    </div>
+  </div>
+</div>
+
+</div>
