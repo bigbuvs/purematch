@@ -1,10 +1,11 @@
 {
-  "enabledMcpjsonServers": [
-    "insforge"
-  ],
   "permissions": {
     "allow": [
-      "mcp__stitch__create_project"
+      "mcp__stitch__create_project",
+      "mcp__stitch__list_projects"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "insforge"
+  ]
 }
