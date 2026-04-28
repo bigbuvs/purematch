@@ -21,15 +21,35 @@ export default function DogProfilePage() {
   const [matchSent, setMatchSent] = useState(false)
 
   useEffect(() => {
-    Promise.all([
-      insforge.from('dogs').select('*').eq('id', id).single(),
-      insforge.from('documents').select('*').eq('dog_id', id).eq('status', 'approved'),
-    ]).then(([{ data: dogData }, { data: docsData }]) => {
+    const load = async () => {
+      const [{ data: dogData }, { data: docsData }] = await Promise.all([
+        insforge.from('dogs').select('*').eq('id', id).single(),
+        insforge.from('documents').select('*').eq('dog_id', id).eq('status', 'approved'),
+      ])
       setDog(dogData)
       setDocs(docsData ?? [])
+
+      if (user) {
+        const { data: myDogs } = await insforge.from('dogs').select('id').eq('owner_id', user.id)
+        if (myDogs?.length) {
+          const myDogIds = myDogs.map(d => d.id)
+          const { data: existing } = await insforge
+            .from('matches')
+            .select('id')
+            .or(
+              myDogIds.map(mid => `and(dog_a_id.eq.${mid},dog_b_id.eq.${id})`).join(',') +
+              ',' +
+              myDogIds.map(mid => `and(dog_a_id.eq.${id},dog_b_id.eq.${mid})`).join(',')
+            )
+            .limit(1)
+          if (existing?.length) setMatchSent(true)
+        }
+      }
+
       setLoading(false)
-    })
-  }, [id])
+    }
+    load()
+  }, [id, user])
 
   const handleMatch = async () => {
     if (!user || !dog) return

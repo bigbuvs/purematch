@@ -45,7 +45,7 @@ export default function OnboardingDogPage() {
       photoUrls.push(publicUrl)
     }
 
-    const { error: insertError } = await insforge.from('dogs').insert({
+    const { data: inserted, error: insertError } = await insforge.from('dogs').insert({
       owner_id: user.id,
       name: form.name,
       breed: form.breed,
@@ -54,10 +54,10 @@ export default function OnboardingDogPage() {
       pedigree_number: form.pedigree || null,
       zone: null,
       photos: photoUrls,
-    })
+    }).select('id').single()
 
-    if (insertError) { setError(insertError.message); setLoading(false); return }
-    router.push('/documents')
+    if (insertError || !inserted) { setError(insertError?.message ?? 'Error al guardar'); setLoading(false); return }
+    router.push(`/documents?dog_id=${inserted.id}`)
   }
 
   return (

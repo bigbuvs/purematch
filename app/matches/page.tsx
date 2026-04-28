@@ -96,10 +96,13 @@ export default function MatchesPage() {
                         <h3 className="text-primary text-sm font-semibold truncate">{m.dogName}</h3>
                         <p className="font-metadata text-xs text-outline">{m.breed}{m.zone ? ` · ${m.zone}` : ''}</p>
                       </div>
-                      {m.unlocked
-                        ? <a href={`tel:${m.phone}`} className="mt-2 inline-flex items-center gap-1 text-primary font-label-caps text-[10px]"><span className="material-symbols-outlined text-sm">call</span>{m.phone}</a>
-                        : <Link href={`/unlock?match_id=${m.id}`} className="mt-2 inline-flex items-center gap-1 text-[#775a19] font-label-caps text-[10px]"><span className="material-symbols-outlined text-sm">lock_open</span>DESBLOQUEAR · $9.990</Link>
-                      }
+                      <Link
+                        href={`/unlock?match_id=${m.id}`}
+                        className={`mt-2 inline-flex items-center gap-1 font-label-caps text-[10px] ${m.unlocked ? 'text-primary' : 'text-[#775a19]'}`}
+                      >
+                        <span className="material-symbols-outlined text-sm">{m.unlocked ? 'contact_phone' : 'lock_open'}</span>
+                        {m.unlocked ? 'VER CONTACTO' : 'DESBLOQUEAR · $9.990'}
+                      </Link>
                     </div>
                   </div>
                 ))}

@@ -105,7 +105,7 @@ export default function ProfilePage() {
           {tab === 'settings' && (
             <div className="flex flex-col gap-3">
               {[
-                { icon: 'person', label: 'Datos personales', action: () => {} },
+                { icon: 'person', label: 'Datos personales', action: () => router.push('/onboarding/user') },
                 { icon: 'notifications', label: 'Notificaciones', action: () => {} },
                 { icon: 'lock', label: 'Seguridad', action: () => {} },
                 { icon: 'help', label: 'Ayuda y soporte', action: () => {} },
