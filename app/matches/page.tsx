@@ -1,129 +1,136 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import TopBar from '@/components/TopBar'
 import BottomNav from '@/components/BottomNav'
+import { insforge } from '@/lib/insforge'
+import { useAuth } from '@/context/AuthContext'
 
-const matchData = {
-  accepted: [
-    {
-      id: '1',
-      name: 'Thor de Los Andes',
-      breed: 'Golden Retriever',
-      zone: 'Las Condes, RM',
-      unlocked: true,
-      phone: '+56 9 8765 4321',
-      img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA3__Q0ufMoiHHoD02iIxQDRsx7Qxt1dT8I0otM87enCrU97qiYA0pQfWYz5V2S65nznkt7j4pvn3JZtNF-R3MmS0lk9OaRwZEG2WwlTgA4-mrLJTHF1olArxWkXNnZIp4QRvCrtERfAkfxZu6-Mc932U8U_okSKc4MPV4xLTx2DiK2BFrHkQHtKr6DOxfgUCvDi6x2wkNusa145B7eMCGgE1TFUCMQC6bVSsKUZAJm2r_kGeOw-pWrBvyD9j7tTca1fiFdbHwgy8X0',
-    },
-    {
-      id: '2',
-      name: 'Maximus del Rey',
-      breed: 'Husky',
-      zone: 'Vitacura, RM',
-      unlocked: false,
-      phone: null,
-      img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDCjiZpgrUlAFjaer3vHMMWgzNkg3MezFwu5DwaWxZsP1wyw2E-ukXtQW3ZAjLJDCYKpSfV2m_fZFcYFBWhy2Z5a3aDzmRQe-r5m870zQ6mlpYI0GI1DN0gcc9tckmPjZZwE7GNeObslycCM67qayPqyan4GEvYgKI_zDuOMKXJ8qIqLp7GlQqpLpjftSuwLtMjv6ixhz8UuaYBFzcMblJIwlnMvOYW3zfjvaYnHsoxBKqgGY_S7AtH1tmym1KyDnks5UEIa-1E1j4P',
-    },
-  ],
-  pending: [
-    {
-      id: '3',
-      name: 'Luna Imperiale',
-      breed: 'Labrador',
-      zone: 'Ñuñoa, RM',
-      img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuApuPGGUYlX87qphBbjM12s6TMgO_-kXPn02xrl_F7mDGhiCXCgqov-8Q70q6kaY9JgQOzk3iq-XSaj_lGdaYrQhpT7NsUmGhNogrNvY6q1tq9OX7wGGPeQ75nsGZZy78AE9T7DLJFPrCyX5mJdVUYyxon1ItGN2XvNzLleRp-tycTfnRUFLPH-XpSpAseGpm8KO0TyItbw2X9yS735A7PKFp3ODG1JQtO-Foab8BHzxZGuuePLVyv67byPrxt7GgL-FiW5ysBZc-1C',
-    },
-  ],
+interface MatchCard {
+  id: string
+  dogName: string
+  breed: string
+  zone: string | null
+  photo: string | null
+  unlocked: boolean
+  phone: string | null
+  mutual: boolean
 }
 
 export default function MatchesPage() {
+  const { user } = useAuth()
   const [tab, setTab] = useState<'accepted' | 'pending'>('accepted')
+  const [accepted, setAccepted] = useState<MatchCard[]>([])
+  const [pending, setPending] = useState<MatchCard[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!user) return
+    const load = async () => {
+      const { data: myDogs } = await insforge.from('dogs').select('id').eq('owner_id', user.id)
+      if (!myDogs?.length) { setLoading(false); return }
+      const dogIds = myDogs.map(d => d.id)
+
+      const { data: matches } = await insforge
+        .from('matches')
+        .select('*, dog_a:dogs!dog_a_id(id,name,breed,zone,photos,owner_id), dog_b:dogs!dog_b_id(id,name,breed,zone,photos,owner_id)')
+        .or(dogIds.map(id => `dog_a_id.eq.${id}`).join(',') + ',' + dogIds.map(id => `dog_b_id.eq.${id}`).join(','))
+
+      const acc: MatchCard[] = []
+      const pend: MatchCard[] = []
+
+      for (const m of matches ?? []) {
+        const iAmA = dogIds.includes((m.dog_a as any).id)
+        const myStatus = iAmA ? m.status_a : m.status_b
+        const theirStatus = iAmA ? m.status_b : m.status_a
+        const otherDog = iAmA ? m.dog_b : m.dog_a
+
+        const card: MatchCard = {
+          id: m.id,
+          dogName: (otherDog as any).name,
+          breed: (otherDog as any).breed,
+          zone: (otherDog as any).zone,
+          photo: (otherDog as any).photos?.[0] ?? null,
+          unlocked: m.contact_unlocked,
+          phone: null,
+          mutual: myStatus === 'accepted' && theirStatus === 'accepted',
+        }
+
+        if (card.mutual) acc.push(card)
+        else if (myStatus === 'accepted') pend.push(card)
+      }
+
+      setAccepted(acc)
+      setPending(pend)
+      setLoading(false)
+    }
+    load()
+  }, [user])
 
   return (
     <div className="bg-surface text-on-surface min-h-screen flex flex-col">
       <TopBar title="Matches" />
-
       <main className="flex-grow pb-[100px] px-4 max-w-[680px] mx-auto w-full pt-4">
-        {/* Tabs */}
         <div className="flex border-b border-outline-variant mb-6">
-          <button
-            onClick={() => setTab('accepted')}
-            className={`flex-1 py-2 font-label-caps text-label-caps text-center transition-colors ${tab === 'accepted' ? 'border-b-2 border-primary text-primary' : 'text-outline hover:text-primary'}`}
-          >
-            ACEPTADOS ({matchData.accepted.length})
-          </button>
-          <button
-            onClick={() => setTab('pending')}
-            className={`flex-1 py-2 font-label-caps text-label-caps text-center transition-colors ${tab === 'pending' ? 'border-b-2 border-primary text-primary' : 'text-outline hover:text-primary'}`}
-          >
-            PENDIENTES ({matchData.pending.length})
-          </button>
+          <button onClick={() => setTab('accepted')} className={`flex-1 py-2 font-label-caps text-label-caps text-center transition-colors ${tab === 'accepted' ? 'border-b-2 border-primary text-primary' : 'text-outline hover:text-primary'}`}>ACEPTADOS ({accepted.length})</button>
+          <button onClick={() => setTab('pending')} className={`flex-1 py-2 font-label-caps text-label-caps text-center transition-colors ${tab === 'pending' ? 'border-b-2 border-primary text-primary' : 'text-outline hover:text-primary'}`}>PENDIENTES ({pending.length})</button>
         </div>
 
-        {tab === 'accepted' && (
-          <div className="flex flex-col gap-4">
-            {matchData.accepted.map(m => (
-              <div key={m.id} className="bg-surface-container-low border border-outline-variant rounded-xl p-4 flex gap-4">
-                <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                  <img src={m.img} alt={m.name} className="w-full h-full object-cover" />
-                </div>
-                <div className="flex flex-col justify-between flex-grow min-w-0">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="material-symbols-outlined text-[#1b5e20] text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
-                      <span className="font-label-caps text-[10px] text-[#1b5e20]">MATCH MUTUO</span>
+        {loading ? (
+          <div className="flex justify-center py-16"><span className="material-symbols-outlined text-4xl text-outline-variant animate-spin">progress_activity</span></div>
+        ) : (
+          <>
+            {tab === 'accepted' && (
+              <div className="flex flex-col gap-4">
+                {accepted.map(m => (
+                  <div key={m.id} className="bg-surface-container-low border border-outline-variant rounded-xl p-4 flex gap-4">
+                    <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container">
+                      {m.photo && <img src={m.photo} alt={m.dogName} className="w-full h-full object-cover" />}
                     </div>
-                    <h3 className="font-headline-sm text-primary text-sm font-semibold truncate">{m.name}</h3>
-                    <p className="font-metadata text-xs text-outline">{m.breed} · {m.zone}</p>
-                  </div>
-                  {m.unlocked ? (
-                    <a href={`tel:${m.phone}`} className="mt-2 inline-flex items-center gap-1 text-primary font-label-caps text-[10px]">
-                      <span className="material-symbols-outlined text-sm">call</span>
-                      {m.phone}
-                    </a>
-                  ) : (
-                    <Link href="/unlock" className="mt-2 inline-flex items-center gap-1 text-[#775a19] font-label-caps text-[10px]">
-                      <span className="material-symbols-outlined text-sm">lock_open</span>
-                      DESBLOQUEAR · $9.990
-                    </Link>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {tab === 'pending' && (
-          <div className="flex flex-col gap-4">
-            {matchData.pending.map(m => (
-              <div key={m.id} className="bg-surface-container-low border border-outline-variant rounded-xl p-4 flex gap-4 opacity-75">
-                <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 relative">
-                  <img src={m.img} alt={m.name} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-primary/20" />
-                </div>
-                <div className="flex flex-col justify-between flex-grow min-w-0">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="material-symbols-outlined text-outline text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>schedule</span>
-                      <span className="font-label-caps text-[10px] text-outline">ESPERANDO RESPUESTA</span>
+                    <div className="flex flex-col justify-between flex-grow min-w-0">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="material-symbols-outlined text-[#1b5e20] text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+                          <span className="font-label-caps text-[10px] text-[#1b5e20]">MATCH MUTUO</span>
+                        </div>
+                        <h3 className="text-primary text-sm font-semibold truncate">{m.dogName}</h3>
+                        <p className="font-metadata text-xs text-outline">{m.breed}{m.zone ? ` · ${m.zone}` : ''}</p>
+                      </div>
+                      {m.unlocked
+                        ? <a href={`tel:${m.phone}`} className="mt-2 inline-flex items-center gap-1 text-primary font-label-caps text-[10px]"><span className="material-symbols-outlined text-sm">call</span>{m.phone}</a>
+                        : <Link href={`/unlock?match_id=${m.id}`} className="mt-2 inline-flex items-center gap-1 text-[#775a19] font-label-caps text-[10px]"><span className="material-symbols-outlined text-sm">lock_open</span>DESBLOQUEAR · $9.990</Link>
+                      }
                     </div>
-                    <h3 className="font-headline-sm text-primary text-sm font-semibold truncate">{m.name}</h3>
-                    <p className="font-metadata text-xs text-outline">{m.breed} · {m.zone}</p>
                   </div>
-                </div>
+                ))}
+                {accepted.length === 0 && <div className="text-center py-16"><span className="material-symbols-outlined text-5xl text-outline-variant block mb-4">handshake</span><p className="text-on-surface-variant">Aún no tienes matches aceptados.</p></div>}
               </div>
-            ))}
-          </div>
-        )}
+            )}
 
-        {tab === 'accepted' && matchData.accepted.length === 0 && (
-          <div className="text-center py-16">
-            <span className="material-symbols-outlined text-5xl text-outline-variant block mb-4">handshake</span>
-            <p className="font-body-md text-on-surface-variant">Aún no tienes matches aceptados.</p>
-          </div>
+            {tab === 'pending' && (
+              <div className="flex flex-col gap-4">
+                {pending.map(m => (
+                  <div key={m.id} className="bg-surface-container-low border border-outline-variant rounded-xl p-4 flex gap-4 opacity-75">
+                    <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 relative bg-surface-container">
+                      {m.photo && <img src={m.photo} alt={m.dogName} className="w-full h-full object-cover" />}
+                      <div className="absolute inset-0 bg-primary/20" />
+                    </div>
+                    <div className="flex flex-col justify-center min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="material-symbols-outlined text-outline text-sm">schedule</span>
+                        <span className="font-label-caps text-[10px] text-outline">ESPERANDO RESPUESTA</span>
+                      </div>
+                      <h3 className="text-primary text-sm font-semibold truncate">{m.dogName}</h3>
+                      <p className="font-metadata text-xs text-outline">{m.breed}</p>
+                    </div>
+                  </div>
+                ))}
+                {pending.length === 0 && <div className="text-center py-16"><span className="material-symbols-outlined text-5xl text-outline-variant block mb-4">schedule</span><p className="text-on-surface-variant">Sin solicitudes pendientes.</p></div>}
+              </div>
+            )}
+          </>
         )}
       </main>
-
       <BottomNav />
     </div>
   )

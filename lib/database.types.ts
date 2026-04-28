@@ -33,7 +33,7 @@ export interface Database {
           created_at: string
         }
         Insert: Omit<Database['public']['Tables']['dogs']['Row'], 'id' | 'created_at' | 'verified' | 'score'>
-        Update: Partial<Database['public']['Tables']['dogs']['Insert']>
+        Update: Partial<Database['public']['Tables']['dogs']['Insert']> & { verified?: boolean; score?: number }
       }
       documents: {
         Row: {
@@ -46,7 +46,7 @@ export interface Database {
           reviewed_at: string | null
         }
         Insert: Omit<Database['public']['Tables']['documents']['Row'], 'id' | 'uploaded_at' | 'reviewed_at'>
-        Update: Partial<Database['public']['Tables']['documents']['Insert']>
+        Update: Partial<Database['public']['Tables']['documents']['Insert']> & { reviewed_at?: string | null }
       }
       matches: {
         Row: {
@@ -60,7 +60,7 @@ export interface Database {
           created_at: string
         }
         Insert: Omit<Database['public']['Tables']['matches']['Row'], 'id' | 'created_at' | 'unlocked_at'>
-        Update: Partial<Database['public']['Tables']['matches']['Insert']>
+        Update: Partial<Database['public']['Tables']['matches']['Insert']> & { contact_unlocked?: boolean; unlocked_at?: string | null }
       }
     }
     Views: {}
