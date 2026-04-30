@@ -27,9 +27,19 @@ const AuthContext = createContext<AuthContextValue>({
   refresh: async () => {},
 })
 
-const hasCsrfCookie = () => {
+const DEMO_USER: User = {
+  id: 'demo-user',
+  email: 'demo@purematch.cl',
+  name: 'Demo User',
+  profile: { name: 'Vista Previa', avatar_url: null },
+  user_metadata: { name: 'Vista Previa' },
+  createdAt: new Date().toISOString(),
+  created_at: new Date().toISOString(),
+}
+
+const hasCookie = (name: string) => {
   if (typeof document === 'undefined') return false
-  return document.cookie.split(';').some(c => c.trim().startsWith('insforge_csrf_token='))
+  return document.cookie.split(';').some(c => c.trim().startsWith(`${name}=`))
 }
 
 const withTimeout = <T,>(p: Promise<T>, ms: number): Promise<T> =>
@@ -43,7 +53,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   const refresh = async () => {
-    if (!hasCsrfCookie()) {
+    if (hasCookie('purematch_demo')) {
+      setUser(DEMO_USER)
+      return
+    }
+    if (!hasCookie('insforge_csrf_token')) {
       setUser(null)
       return
     }
@@ -66,6 +80,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const signOut = async () => {
+    // Clear demo cookie
+    document.cookie = 'purematch_demo=; path=/; max-age=0'
     try {
       await withTimeout(insforge.auth.signOut(), 5000)
     } catch {}
