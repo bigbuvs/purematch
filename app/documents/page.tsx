@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import TopBar from '@/components/TopBar'
 import { insforge } from '@/lib/insforge'
@@ -30,6 +30,10 @@ const STATUS_CONFIG = {
 }
 
 export default function DocumentsPage() {
+  return <Suspense><DocumentsPageInner /></Suspense>
+}
+
+function DocumentsPageInner() {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -49,7 +53,7 @@ export default function DocumentsPage() {
     if (authLoading) return
     if (!user) { router.replace('/auth'); return }
 
-    insforge.from('dogs').select('*').eq('owner_id', user.id).then(({ data }) => {
+    insforge.from('dogs').select('*').eq('owner_id', user.id).then(({ data }: { data: Dog[] | null }) => {
       const list = data ?? []
       setDogs(list)
       if (!selectedDogId && list.length > 0) setSelectedDogId(list[0].id)

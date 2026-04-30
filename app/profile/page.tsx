@@ -21,12 +21,12 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!user) return
     const load = async () => {
-      const [{ data: dogsData }, { count }] = await Promise.all([
-        insforge.from('dogs').select('*').eq('owner_id', user.id),
-        insforge.from('matches').select('*', { count: 'exact', head: true })
-          .or(`dog_a_id.in.(${(dogsData ?? []).map((d: Dog) => d.id).join(',') || 'null'}),dog_b_id.in.(${(dogsData ?? []).map((d: Dog) => d.id).join(',') || 'null'})`)
-          .eq('status_a', 'accepted').eq('status_b', 'accepted'),
-      ])
+      const { data: dogsData } = await insforge.from('dogs').select('*').eq('owner_id', user.id)
+      const dogIds = (dogsData ?? []).map((d: Dog) => d.id)
+      const idList = dogIds.join(',') || 'null'
+      const { count } = await insforge.from('matches').select('*', { count: 'exact', head: true })
+        .or(`dog_a_id.in.(${idList}),dog_b_id.in.(${idList})`)
+        .eq('status_a', 'accepted').eq('status_b', 'accepted')
       setDogs(dogsData ?? [])
       setMatchCount(count ?? 0)
       setLoading(false)
