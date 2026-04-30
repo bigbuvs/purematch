@@ -53,7 +53,7 @@ function DocumentsPageInner() {
     if (authLoading) return
     if (!user) { router.replace('/auth'); return }
 
-    insforge.from('dogs').select('*').eq('owner_id', user.id).then(({ data }: { data: Dog[] | null }) => {
+    insforge.database.from('dogs').select('*').eq('owner_id', user.id).then(({ data }: { data: Dog[] | null }) => {
       const list = data ?? []
       setDogs(list)
       if (!selectedDogId && list.length > 0) setSelectedDogId(list[0].id)
@@ -63,7 +63,7 @@ function DocumentsPageInner() {
 
   useEffect(() => {
     if (!selectedDogId) return
-    insforge.from('documents').select('*').eq('dog_id', selectedDogId).then(({ data }) => {
+    insforge.database.from('documents').select('*').eq('dog_id', selectedDogId).then(({ data }) => {
       setExistingDocs(data ?? [])
     })
   }, [selectedDogId])
@@ -85,7 +85,7 @@ function DocumentsPageInner() {
 
     const { data: storageData, error: storageErr } = await insforge.storage
       .from('documents')
-      .upload(path, file, { upsert: true })
+      .upload(path, file)
 
     if (storageErr || !storageData) {
       setErrors(e => ({ ...e, [type]: 'Error al subir el archivo. Intenta de nuevo.' }))
@@ -93,16 +93,16 @@ function DocumentsPageInner() {
       return
     }
 
-    const { data: { publicUrl } } = insforge.storage.from('documents').getPublicUrl(storageData.path)
+    const publicUrl = storageData.url
 
     const existing = getDoc(type)
     if (existing) {
-      await insforge.from('documents').update({ file_url: publicUrl, status: 'pending', reviewed_at: null }).eq('id', existing.id)
+      await insforge.database.from('documents').update({ file_url: publicUrl, status: 'pending', reviewed_at: null }).eq('id', existing.id)
     } else {
-      await insforge.from('documents').insert({ dog_id: selectedDogId, type, file_url: publicUrl, status: 'pending' })
+      await insforge.database.from('documents').insert({ dog_id: selectedDogId, type, file_url: publicUrl, status: 'pending' })
     }
 
-    const { data: refreshed } = await insforge.from('documents').select('*').eq('dog_id', selectedDogId)
+    const { data: refreshed } = await insforge.database.from('documents').select('*').eq('dog_id', selectedDogId)
     setExistingDocs(refreshed ?? [])
     setUploading(u => ({ ...u, [type]: false }))
   }

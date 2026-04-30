@@ -1,7 +1,9 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@insforge/sdk'
 
-const url = process.env.NEXT_PUBLIC_INSFORGE_URL ?? ''
-const anonKey = process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY ?? ''
+const baseUrl = process.env.NEXT_PUBLIC_INSFORGE_URL ?? ''
+const anonKey = process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const insforge = createClient<any>(url, anonKey)
+export const insforge = createClient({
+  baseUrl,
+  anonKey: anonKey || undefined,
+})

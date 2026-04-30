@@ -40,12 +40,11 @@ export default function OnboardingDogPage() {
       const ext = file.name.split('.').pop()
       const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
       const { data, error: uploadError } = await insforge.storage.from('dog-photos').upload(path, file)
-      if (uploadError) { setError(uploadError.message); setLoading(false); return }
-      const { data: { publicUrl } } = insforge.storage.from('dog-photos').getPublicUrl(data.path)
-      photoUrls.push(publicUrl)
+      if (uploadError || !data) { setError(uploadError?.message ?? 'Error al subir foto'); setLoading(false); return }
+      photoUrls.push(data.url)
     }
 
-    const { data: inserted, error: insertError } = await insforge.from('dogs').insert({
+    const { data: inserted, error: insertError } = await insforge.database.from('dogs').insert({
       owner_id: user.id,
       name: form.name,
       breed: form.breed,

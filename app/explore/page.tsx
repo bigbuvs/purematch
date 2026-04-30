@@ -18,7 +18,7 @@ export default function ExplorePage() {
 
   useEffect(() => {
     insforge
-      .from('dogs')
+      .database.from('dogs')
       .select('*')
       .eq('verified', true)
       .order('created_at', { ascending: false })

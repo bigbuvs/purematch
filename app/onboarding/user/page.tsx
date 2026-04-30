@@ -19,7 +19,7 @@ export default function OnboardingUserPage() {
     e.preventDefault()
     if (!user) return
     setLoading(true); setError('')
-    const { error } = await insforge.from('users').upsert({
+    const { error } = await insforge.database.from('users').upsert({
       id: user.id,
       name: form.name,
       email: user.email!,

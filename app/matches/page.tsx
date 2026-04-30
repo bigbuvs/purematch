@@ -27,12 +27,12 @@ export default function MatchesPage() {
   useEffect(() => {
     if (!user) return
     const load = async () => {
-      const { data: myDogs } = await insforge.from('dogs').select('id').eq('owner_id', user.id)
+      const { data: myDogs } = await insforge.database.from('dogs').select('id').eq('owner_id', user.id)
       if (!myDogs?.length) { setLoading(false); return }
       const dogIds = myDogs.map(d => d.id)
 
       const { data: matches } = await insforge
-        .from('matches')
+        .database.from('matches')
         .select('*, dog_a:dogs!dog_a_id(id,name,breed,zone,photos,owner_id), dog_b:dogs!dog_b_id(id,name,breed,zone,photos,owner_id)')
         .or(dogIds.map(id => `dog_a_id.eq.${id}`).join(',') + ',' + dogIds.map(id => `dog_b_id.eq.${id}`).join(','))
 

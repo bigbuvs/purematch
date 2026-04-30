@@ -1,44 +1,62 @@
 'use client'
 import { createContext, useContext, useEffect, useState } from 'react'
-import type { Session, User } from '@supabase/supabase-js'
 import { insforge } from '@/lib/insforge'
 
+interface User {
+  id: string
+  email: string
+  name?: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  user_metadata?: { name?: string; avatar_url?: string; [key: string]: any }
+  created_at?: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any
+}
+
 interface AuthContextValue {
-  session: Session | null
   user: User | null
   loading: boolean
   signOut: () => Promise<void>
+  refresh: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue>({
-  session: null,
   user: null,
   loading: true,
   signOut: async () => {},
+  refresh: async () => {},
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null)
+  const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
+  const refresh = async () => {
+    try {
+      const { data } = await insforge.auth.getCurrentUser()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const u = (data as any)?.user ?? data ?? null
+      setUser(u as User | null)
+    } catch {
+      setUser(null)
+    }
+  }
+
   useEffect(() => {
-    insforge.auth.getSession().then(({ data }) => {
-      setSession(data.session)
+    const load = async () => {
+      await refresh()
       setLoading(false)
-    })
-    const { data: { subscription } } = insforge.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
-    return () => subscription.unsubscribe()
+    }
+    load()
   }, [])
 
+  const signOut = async () => {
+    await insforge.auth.signOut()
+    setUser(null)
+  }
+
   return (
-    <AuthContext.Provider value={{
-      session,
-      user: session?.user ?? null,
-      loading,
-      signOut: () => insforge.auth.signOut().then(() => {}),
-    }}>
+    <AuthContext.Provider value={{ user, loading, signOut, refresh }}>
       {children}
     </AuthContext.Provider>
   )
