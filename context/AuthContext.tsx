@@ -27,13 +27,28 @@ const AuthContext = createContext<AuthContextValue>({
   refresh: async () => {},
 })
 
+const hasCsrfCookie = () => {
+  if (typeof document === 'undefined') return false
+  return document.cookie.split(';').some(c => c.trim().startsWith('insforge_csrf_token='))
+}
+
+const withTimeout = <T,>(p: Promise<T>, ms: number): Promise<T> =>
+  Promise.race([
+    p,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
+  ])
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
   const refresh = async () => {
+    if (!hasCsrfCookie()) {
+      setUser(null)
+      return
+    }
     try {
-      const { data } = await insforge.auth.getCurrentUser()
+      const { data } = await withTimeout(insforge.auth.getCurrentUser(), 5000)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const u = (data as any)?.user ?? data ?? null
       setUser(u as User | null)
@@ -51,7 +66,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const signOut = async () => {
-    await insforge.auth.signOut()
+    try {
+      await withTimeout(insforge.auth.signOut(), 5000)
+    } catch {}
     setUser(null)
   }
 
