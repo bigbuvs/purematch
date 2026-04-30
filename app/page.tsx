@@ -13,7 +13,7 @@ const featuredDogs = [
     age: '2 años',
     sex: 'Hembra',
     zone: 'Providencia, RM',
-    img: 'https://images.unsplash.com/photo-1503256207526-0d5523f31580?auto=format&fit=crop&w=600&h=600&q=80',
+    img: 'https://images.unsplash.com/photo-1589209534004-0c3ec3d8a9e5?auto=format&fit=crop&w=600&h=600&q=80',
     kcc: 'KCC-2024-BC-00892',
   },
   {
@@ -37,7 +37,7 @@ const featuredDogs = [
 ]
 
 const breeds = [
-  { name: 'Border Collie',     img: 'https://images.unsplash.com/photo-1503256207526-0d5523f31580?auto=format&fit=crop&w=400&h=300&q=80' },
+  { name: 'Border Collie',     img: 'https://images.unsplash.com/photo-1589209534004-0c3ec3d8a9e5?auto=format&fit=crop&w=400&h=300&q=80' },
   { name: 'Golden Retriever',  img: 'https://images.unsplash.com/photo-1534361960057-19f4434a78d9?auto=format&fit=crop&w=400&h=300&q=80' },
   { name: 'Husky Siberiano',   img: 'https://images.unsplash.com/photo-1605568427561-40dd23c2acea?auto=format&fit=crop&w=400&h=300&q=80' },
   { name: 'German Shepherd',   img: 'https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?auto=format&fit=crop&w=400&h=300&q=80' },
