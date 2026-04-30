@@ -5,13 +5,8 @@ const PROTECTED = ['/explore', '/matches', '/profile', '/dog', '/onboarding', '/
 const AUTH_ROUTES = ['/auth']
 
 function hasAuthCookie(request: NextRequest): boolean {
-  // Supabase-compatible clients store the session in cookies named sb-<project-ref>-auth-token
-  // InsForge project ref is extracted from NEXT_PUBLIC_INSFORGE_URL at build time
-  // We check for any cookie matching the pattern to avoid hardcoding the project ref
-  for (const name of request.cookies.getAll().map(c => c.name)) {
-    if (name.startsWith('sb-') && name.endsWith('-auth-token')) return true
-  }
-  return false
+  // InsForge SDK sets insforge_csrf_token cookie when user is authenticated
+  return request.cookies.has('insforge_csrf_token')
 }
 
 export function middleware(request: NextRequest) {
