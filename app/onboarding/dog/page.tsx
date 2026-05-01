@@ -2,6 +2,7 @@
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import TopBar from '@/components/TopBar'
 import { insforge } from '@/lib/insforge'
 import { useAuth } from '@/context/AuthContext'
 
@@ -34,7 +35,6 @@ export default function OnboardingDogPage() {
     if (!user) return
     setLoading(true); setError('')
 
-    // Upload photos to InsForge Storage
     const photoUrls: string[] = []
     for (const file of photos) {
       const ext = file.name.split('.').pop()
@@ -60,96 +60,164 @@ export default function OnboardingDogPage() {
   }
 
   return (
-    <div className="bg-surface text-on-surface min-h-screen flex flex-col items-center">
-      <main className="w-full max-w-md px-6 py-12 flex flex-col">
-        <div className="flex items-center gap-2 mb-8">
-          <div className="flex items-center gap-1">
-            <div className="w-8 h-8 rounded-full bg-surface-container text-outline flex items-center justify-center font-label-caps text-label-caps">1</div>
-            <span className="font-label-caps text-[10px] text-outline">TU PERFIL</span>
+    <div className="bg-[#fcf9f8] min-h-screen flex flex-col">
+      <TopBar title="Registrar perro" showBack />
+
+      <main className="flex-grow max-w-[680px] mx-auto w-full px-5 py-8">
+
+        {/* Step indicator */}
+        <div className="flex items-center gap-3 mb-8">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-[#fed488] text-[#261900] flex items-center justify-center text-[12px] font-bold">
+              <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>
+            </div>
+            <span className="text-[10px] font-bold tracking-[0.08em] text-[#775a19] hidden sm:block">TU PERFIL</span>
           </div>
-          <div className="flex-grow h-px bg-primary" />
-          <div className="flex items-center gap-1">
-            <div className="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-caps text-label-caps">2</div>
-            <span className="font-label-caps text-[10px] text-primary">TU PERRO</span>
+          <div className="flex-grow h-[2px] bg-[#fed488]" />
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-[#061b0e] text-white flex items-center justify-center text-[12px] font-bold">2</div>
+            <span className="text-[10px] font-bold tracking-[0.08em] text-[#061b0e] hidden sm:block">TU PERRO</span>
           </div>
         </div>
 
         <header className="mb-8">
-          <h1 className="font-serif font-bold text-xl text-primary tracking-widest uppercase mb-1">PureMatch</h1>
-          <h2 className="font-headline-sm text-primary text-2xl mb-2">Registra tu perro</h2>
-          <p className="text-on-surface-variant text-sm">Agrega las fotos y datos de tu ejemplar.</p>
+          <h2 className="font-serif font-bold text-[#061b0e] text-2xl tracking-tight mb-2">Tu ejemplar</h2>
+          <p className="text-[#737973] text-sm leading-relaxed">Sube fotos y completa los datos de tu perro de pedigree.</p>
         </header>
 
-        {error && <div className="bg-error-container text-on-error-container text-xs px-4 py-3 rounded-lg mb-4">{error}</div>}
+        {error && (
+          <div className="bg-[#ffdad6] text-[#93000a] text-[12px] px-4 py-3 rounded-xl mb-4 flex items-start gap-2">
+            <span className="material-symbols-outlined text-[16px] mt-0.5">error</span>
+            {error}
+          </div>
+        )}
 
-        <div className="mb-6">
-          <label className="font-label-caps text-label-caps text-on-surface-variant mb-3 ml-1 block">FOTOS (máx. 6)</label>
+        {/* Photos section */}
+        <div className="bg-white border border-[#e4e2e1] rounded-2xl p-6 shadow-[0_2px_12px_rgba(6,27,14,0.04)] mb-5">
+          <div className="flex items-center justify-between mb-4">
+            <label className="text-[10px] font-bold tracking-[0.1em] text-[#737973]">FOTOS · MÁX. 6</label>
+            <span className="text-[10px] text-[#a0a5a0]">{previews.length}/6</span>
+          </div>
           <div className="grid grid-cols-3 gap-2">
             {previews.map((url, i) => (
-              <div key={i} className="aspect-square rounded-lg overflow-hidden relative group">
+              <div key={i} className="aspect-square rounded-xl overflow-hidden relative group bg-[#f0eded]">
                 <img src={url} alt="" className="w-full h-full object-cover" />
-                <button onClick={() => removePhoto(i)} className="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <span className="material-symbols-outlined text-white">close</span>
+                {i === 0 && (
+                  <div className="absolute top-1.5 left-1.5 bg-[#fed488] text-[#261900] text-[8px] font-bold px-1.5 py-0.5 rounded-full">
+                    PRINCIPAL
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => removePhoto(i)}
+                  className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-[#061b0e]/80 hover:bg-[#061b0e] text-white flex items-center justify-center backdrop-blur-sm"
+                >
+                  <span className="material-symbols-outlined text-[14px]">close</span>
                 </button>
               </div>
             ))}
             {previews.length < 6 && (
-              <button type="button" onClick={() => fileRef.current?.click()} className="aspect-square rounded-lg border-2 border-dashed border-outline-variant flex flex-col items-center justify-center gap-1 hover:border-primary hover:bg-surface-container transition-colors">
-                <span className="material-symbols-outlined text-outline text-2xl">add_photo_alternate</span>
-                <span className="font-label-caps text-[9px] text-outline">FOTO</span>
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                className="aspect-square rounded-xl border-2 border-dashed border-[#c3c8c1] flex flex-col items-center justify-center gap-1 hover:border-[#061b0e] hover:bg-[#f0eded] transition-colors"
+              >
+                <span className="material-symbols-outlined text-[#737973] text-[28px]">add_photo_alternate</span>
+                <span className="text-[9px] font-bold tracking-[0.08em] text-[#737973]">AGREGAR</span>
               </button>
             )}
           </div>
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handlePhoto(f); e.target.value = '' }} />
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div className="flex flex-col">
-            <label className="font-label-caps text-label-caps text-on-surface-variant mb-1 ml-1">NOMBRE DEL PERRO *</label>
-            <input className="bg-surface-container-low border-b border-primary border-t-0 border-l-0 border-r-0 focus:ring-0 px-4 py-3 placeholder:text-outline-variant text-body-md" placeholder="Ej. Arya von Westwood" type="text" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
-          </div>
-          <div className="flex flex-col">
-            <label className="font-label-caps text-label-caps text-on-surface-variant mb-1 ml-1">RAZA *</label>
-            <div className="relative">
-              <select className="w-full bg-surface-container-low border-b border-primary border-t-0 border-l-0 border-r-0 focus:ring-0 px-4 py-3 text-body-md appearance-none cursor-pointer" value={form.breed} onChange={e => setForm(p => ({ ...p, breed: e.target.value }))}>
-                <option value="">Selecciona la raza</option>
-                {breeds.map(b => <option key={b} value={b}>{b}</option>)}
-              </select>
-              <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline pointer-events-none">expand_more</span>
+        {/* Form card */}
+        <div className="bg-white border border-[#e4e2e1] rounded-2xl p-6 shadow-[0_2px_12px_rgba(6,27,14,0.04)]">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <Field label="NOMBRE DEL PERRO *" placeholder="Ej. Arya von Westwood" value={form.name} onChange={v => setForm(p => ({ ...p, name: v }))} />
+
+            <div className="flex flex-col">
+              <label className="text-[10px] font-bold tracking-[0.1em] text-[#737973] mb-1.5 ml-1">RAZA *</label>
+              <div className="relative">
+                <select
+                  className="w-full bg-[#fcf9f8] border border-[#c3c8c1] rounded-xl px-4 py-3 text-[14px] text-[#1b1c1c] focus:outline-none focus:border-[#061b0e] transition-colors appearance-none cursor-pointer"
+                  value={form.breed}
+                  onChange={e => setForm(p => ({ ...p, breed: e.target.value }))}
+                >
+                  <option value="">Selecciona la raza</option>
+                  {breeds.map(b => <option key={b} value={b}>{b}</option>)}
+                </select>
+                <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-[#737973] pointer-events-none text-[18px]">expand_more</span>
+              </div>
             </div>
-          </div>
-          <div className="flex gap-4">
-            <div className="flex flex-col flex-1">
-              <label className="font-label-caps text-label-caps text-on-surface-variant mb-1 ml-1">EDAD *</label>
-              <input className="bg-surface-container-low border-b border-primary border-t-0 border-l-0 border-r-0 focus:ring-0 px-4 py-3 placeholder:text-outline-variant text-body-md" placeholder="Ej. 2 años" type="text" value={form.age} onChange={e => setForm(p => ({ ...p, age: e.target.value }))} />
+
+            <div className="flex gap-4">
+              <div className="flex flex-col flex-1">
+                <Field label="EDAD *" placeholder="Ej. 2 años" value={form.age} onChange={v => setForm(p => ({ ...p, age: v }))} />
+              </div>
             </div>
-            <div className="flex flex-col flex-1">
-              <label className="font-label-caps text-label-caps text-on-surface-variant mb-1 ml-1">SEXO *</label>
-              <div className="flex gap-2 mt-1">
+
+            <div className="flex flex-col">
+              <label className="text-[10px] font-bold tracking-[0.1em] text-[#737973] mb-1.5 ml-1">SEXO *</label>
+              <div className="grid grid-cols-2 gap-2">
                 {(['Macho', 'Hembra'] as const).map(s => (
-                  <button key={s} type="button" onClick={() => setForm(p => ({ ...p, sex: s }))} className={`flex-1 py-3 font-label-caps text-label-caps border transition-colors ${form.sex === s ? 'bg-primary text-on-primary border-primary' : 'bg-transparent text-outline border-outline-variant hover:border-primary'}`}>
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setForm(p => ({ ...p, sex: s }))}
+                    className={`py-3 rounded-xl text-[12px] font-bold tracking-[0.08em] border transition-all flex items-center justify-center gap-1.5 ${
+                      form.sex === s
+                        ? 'bg-[#061b0e] text-white border-[#061b0e]'
+                        : 'bg-[#fcf9f8] text-[#737973] border-[#c3c8c1] hover:border-[#061b0e]'
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                      {s === 'Macho' ? 'male' : 'female'}
+                    </span>
                     {s.toUpperCase()}
                   </button>
                 ))}
               </div>
             </div>
-          </div>
-          <div className="flex flex-col">
-            <label className="font-label-caps text-label-caps text-on-surface-variant mb-1 ml-1">Nº PEDIGREE KCC (opcional)</label>
-            <input className="bg-surface-container-low border-b border-primary border-t-0 border-l-0 border-r-0 focus:ring-0 px-4 py-3 placeholder:text-outline-variant text-body-md" placeholder="Ej. KCC-2024-BC-00892" type="text" value={form.pedigree} onChange={e => setForm(p => ({ ...p, pedigree: e.target.value }))} />
-          </div>
-          <div className="pt-4">
-            <button type="submit" disabled={!allFilled || loading} className={`w-full font-label-caps text-label-caps py-4 transition-colors ${allFilled && !loading ? 'bg-primary text-on-primary hover:bg-primary-container' : 'bg-surface-container text-outline cursor-not-allowed'}`}>
-              {loading ? 'GUARDANDO...' : 'CONTINUAR'} {!loading && <span className="material-symbols-outlined text-sm ml-2 align-middle">arrow_forward</span>}
+
+            <Field label="Nº PEDIGREE KCC (OPCIONAL)" placeholder="Ej. KCC-2024-BC-00892" value={form.pedigree} onChange={v => setForm(p => ({ ...p, pedigree: v }))} />
+
+            <button
+              type="submit"
+              disabled={!allFilled || loading}
+              className={`w-full text-[12px] font-bold tracking-[0.08em] py-3.5 rounded-full mt-2 transition-colors flex items-center justify-center gap-2 ${
+                allFilled && !loading
+                  ? 'bg-[#061b0e] text-white hover:bg-[#1b3022]'
+                  : 'bg-[#e4e2e1] text-[#a0a5a0] cursor-not-allowed'
+              }`}
+            >
+              {loading
+                ? <><span className="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>GUARDANDO...</>
+                : <>CONTINUAR<span className="material-symbols-outlined text-[16px]">arrow_forward</span></>
+              }
             </button>
-          </div>
-        </form>
-        <div className="mt-4">
-          <Link href="/onboarding/user" className="flex items-center gap-1 text-outline font-label-caps text-[10px] hover:text-primary transition-colors">
-            <span className="material-symbols-outlined text-sm">arrow_back</span>VOLVER
-          </Link>
+          </form>
         </div>
+
+        <Link href="/onboarding/user" className="flex items-center gap-1.5 text-[#737973] text-[10px] font-bold tracking-[0.08em] mt-6 hover:text-[#061b0e] transition-colors">
+          <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+          VOLVER
+        </Link>
       </main>
+    </div>
+  )
+}
+
+function Field({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
+  return (
+    <div className="flex flex-col">
+      <label className="text-[10px] font-bold tracking-[0.1em] text-[#737973] mb-1.5 ml-1">{label}</label>
+      <input
+        type="text"
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full bg-[#fcf9f8] border border-[#c3c8c1] rounded-xl px-4 py-3 text-[14px] text-[#1b1c1c] placeholder:text-[#a0a5a0] focus:outline-none focus:border-[#061b0e] transition-colors"
+      />
     </div>
   )
 }

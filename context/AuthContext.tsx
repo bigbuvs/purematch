@@ -7,6 +7,8 @@ interface User {
   email: string
   name?: string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  profile?: { name?: string; avatar_url?: string | null; [key: string]: any }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   user_metadata?: { name?: string; avatar_url?: string; [key: string]: any }
   created_at?: string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,10 +32,9 @@ const AuthContext = createContext<AuthContextValue>({
 const DEMO_USER: User = {
   id: 'demo-user',
   email: 'demo@purematch.cl',
-  name: 'Demo User',
+  name: 'Vista Previa',
   profile: { name: 'Vista Previa', avatar_url: null },
   user_metadata: { name: 'Vista Previa' },
-  createdAt: new Date().toISOString(),
   created_at: new Date().toISOString(),
 }
 
@@ -62,7 +63,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return
     }
     try {
-      const { data } = await withTimeout(insforge.auth.getCurrentUser(), 5000)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data } = await withTimeout(insforge.auth.getCurrentUser() as Promise<any>, 5000)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const u = (data as any)?.user ?? data ?? null
       setUser(u as User | null)
@@ -80,10 +82,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const signOut = async () => {
-    // Clear demo cookie
     document.cookie = 'purematch_demo=; path=/; max-age=0'
     try {
-      await withTimeout(insforge.auth.signOut(), 5000)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await withTimeout(insforge.auth.signOut() as Promise<any>, 5000)
     } catch {}
     setUser(null)
   }

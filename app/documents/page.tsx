@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef, useEffect, Suspense } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import TopBar from '@/components/TopBar'
 import { insforge } from '@/lib/insforge'
@@ -15,25 +15,22 @@ interface DocZone {
   label: string
   description: string
   required: boolean
+  icon: string
 }
 
 const DOC_ZONES: DocZone[] = [
-  { id: 'pedigree', label: 'Certificado KCC / Pedigree', description: 'PDF o imagen del registro oficial de la Kennel Club de Chile', required: true },
-  { id: 'vaccines', label: 'Cartilla de Vacunas', description: 'Documento actualizado con todas las vacunas vigentes', required: true },
-  { id: 'health', label: 'Prueba de Displasia / Salud', description: 'Certificado veterinario de pruebas genéticas y de salud', required: false },
+  { id: 'pedigree', label: 'Certificado KCC / Pedigree', description: 'PDF o imagen del registro oficial de la Kennel Club de Chile', required: true, icon: 'workspace_premium' },
+  { id: 'vaccines', label: 'Cartilla de Vacunas', description: 'Documento actualizado con todas las vacunas vigentes', required: true, icon: 'vaccines' },
+  { id: 'health', label: 'Prueba de Displasia / Salud', description: 'Certificado veterinario de pruebas genéticas y de salud', required: false, icon: 'health_and_safety' },
 ]
 
 const STATUS_CONFIG = {
-  pending:  { label: 'EN REVISIÓN', bg: 'bg-[#fff8e1]', text: 'text-[#775a19]', icon: 'hourglass_empty' },
-  approved: { label: 'APROBADO',    bg: 'bg-[#e8f5e9]', text: 'text-[#1b5e20]', icon: 'check_circle' },
-  rejected: { label: 'RECHAZADO',   bg: 'bg-[#fce4ec]', text: 'text-error',     icon: 'cancel' },
+  pending:  { label: 'EN REVISIÓN', bg: 'bg-[#fed488]/25', border: 'border-[#fed488]/60', text: 'text-[#775a19]', icon: 'hourglass_empty' },
+  approved: { label: 'APROBADO',    bg: 'bg-[#e8f5e9]',   border: 'border-[#1b5e20]/30', text: 'text-[#1b5e20]', icon: 'check_circle' },
+  rejected: { label: 'RECHAZADO',   bg: 'bg-[#ffdad6]',   border: 'border-[#ba1a1a]/30', text: 'text-[#ba1a1a]', icon: 'cancel' },
 }
 
 export default function DocumentsPage() {
-  return <Suspense><DocumentsPageInner /></Suspense>
-}
-
-function DocumentsPageInner() {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -53,7 +50,7 @@ function DocumentsPageInner() {
     if (authLoading) return
     if (!user) { router.replace('/auth'); return }
 
-    insforge.database.from('dogs').select('*').eq('owner_id', user.id).then(({ data }: { data: Dog[] | null }) => {
+    insforge.database.from('dogs').select('*').eq('owner_id', user.id).then(({ data }) => {
       const list = data ?? []
       setDogs(list)
       if (!selectedDogId && list.length > 0) setSelectedDogId(list[0].id)
@@ -84,8 +81,7 @@ function DocumentsPageInner() {
     const path = `${selectedDogId}/${type}-${Date.now()}.${ext}`
 
     const { data: storageData, error: storageErr } = await insforge.storage
-      .from('documents')
-      .upload(path, file)
+      .from('documents').upload(path, file)
 
     if (storageErr || !storageData) {
       setErrors(e => ({ ...e, [type]: 'Error al subir el archivo. Intenta de nuevo.' }))
@@ -110,37 +106,42 @@ function DocumentsPageInner() {
   const handleSubmit = async () => {
     if (!selectedDogId) return
     setSubmitting(true)
-    // All uploads are already persisted individually; submission just flags intent
     await new Promise(r => setTimeout(r, 600))
     setSubmitted(true)
     setSubmitting(false)
   }
 
   const requiredDone = DOC_ZONES.filter(d => d.required).every(d => !!getDoc(d.id))
+  const totalRequired = DOC_ZONES.filter(d => d.required).length
+  const totalDone = DOC_ZONES.filter(d => d.required && getDoc(d.id)).length
 
   if (authLoading || pageLoading) {
     return (
-      <div className="min-h-screen bg-surface flex items-center justify-center">
-        <span className="material-symbols-outlined text-outline animate-spin text-3xl">progress_activity</span>
+      <div className="min-h-screen bg-[#fcf9f8] flex flex-col items-center justify-center gap-3">
+        <span className="material-symbols-outlined text-[#c3c8c1] animate-spin text-5xl">progress_activity</span>
+        <p className="text-[10px] font-bold tracking-[0.1em] text-[#737973]">CARGANDO...</p>
       </div>
     )
   }
 
   if (submitted) {
     return (
-      <div className="bg-surface text-on-surface min-h-screen flex flex-col">
+      <div className="bg-[#fcf9f8] min-h-screen flex flex-col">
         <TopBar showBack title="Documentación" />
-        <div className="flex-grow flex flex-col items-center justify-center px-6 text-center gap-6">
+        <div className="flex-grow flex flex-col items-center justify-center px-6 text-center gap-5">
           <div className="w-20 h-20 rounded-full bg-[#e8f5e9] flex items-center justify-center">
             <span className="material-symbols-outlined text-[#1b5e20] text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
           </div>
           <div>
-            <h2 className="font-headline-sm text-headline-sm text-primary text-xl mb-2">Documentos enviados</h2>
-            <p className="font-body-md text-sm text-on-surface-variant leading-relaxed">
-              Nuestro equipo revisará tu documentación en 24–48 horas hábiles.<br />Te notificaremos cuando tu perfil esté verificado.
+            <h2 className="font-serif font-bold text-[#061b0e] text-2xl mb-2">Documentos enviados</h2>
+            <p className="text-[#737973] text-sm leading-relaxed max-w-[320px]">
+              Nuestro equipo revisará tu documentación en 24–48 horas hábiles. Te notificaremos cuando tu perfil esté verificado.
             </p>
           </div>
-          <button onClick={() => router.push('/profile')} className="bg-primary text-on-primary font-label-caps text-label-caps px-8 py-3 hover:bg-primary-container transition-colors">
+          <button
+            onClick={() => router.push('/profile')}
+            className="bg-[#061b0e] text-white text-[12px] font-bold tracking-[0.08em] px-8 py-3 rounded-full hover:bg-[#1b3022] transition-colors"
+          >
             VER MI PERFIL
           </button>
         </div>
@@ -149,101 +150,148 @@ function DocumentsPageInner() {
   }
 
   return (
-    <div className="bg-surface text-on-surface min-h-screen flex flex-col">
+    <div className="bg-[#fcf9f8] min-h-screen flex flex-col">
       <TopBar showBack title="Documentación" />
 
       <main className="flex-grow pb-[120px] px-4 max-w-[680px] mx-auto w-full pt-6">
-        {/* Dog selector */}
-        {dogs.length > 1 && (
-          <div className="mb-6">
-            <p className="font-label-caps text-[10px] text-outline mb-2">EJEMPLAR</p>
-            <div className="flex gap-2 flex-wrap">
-              {dogs.map(dog => (
-                <button
-                  key={dog.id}
-                  onClick={() => setSelectedDogId(dog.id)}
-                  className={`px-4 py-2 rounded-full border font-label-caps text-label-caps transition-colors ${
-                    selectedDogId === dog.id
-                      ? 'bg-primary text-on-primary border-primary'
-                      : 'border-outline-variant text-outline hover:border-primary hover:text-primary'
-                  }`}
-                >
-                  {dog.name}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
 
         {dogs.length === 0 ? (
-          <div className="text-center py-16">
-            <span className="material-symbols-outlined text-outline text-4xl mb-3 block">pets</span>
-            <p className="font-body-md text-sm text-on-surface-variant mb-4">Primero registra un ejemplar para subir documentos.</p>
-            <button onClick={() => router.push('/onboarding/dog')} className="bg-primary text-on-primary font-label-caps text-label-caps px-6 py-3 hover:bg-primary-container transition-colors">
+          <div className="text-center py-20 flex flex-col items-center gap-4">
+            <div className="w-16 h-16 bg-[#f0eded] rounded-full flex items-center justify-center">
+              <span className="material-symbols-outlined text-3xl text-[#c3c8c1]">pets</span>
+            </div>
+            <div>
+              <p className="font-serif font-semibold text-[#061b0e] mb-1">Sin ejemplares registrados</p>
+              <p className="text-[#737973] text-sm">Primero registra un perro para subir documentación.</p>
+            </div>
+            <button
+              onClick={() => router.push('/onboarding/dog')}
+              className="bg-[#061b0e] text-white text-[12px] font-bold tracking-[0.08em] px-6 py-3 rounded-full hover:bg-[#1b3022] transition-colors"
+            >
               REGISTRAR EJEMPLAR
             </button>
           </div>
         ) : (
           <>
-            <div className="mb-8">
-              <h2 className="font-headline-sm text-headline-sm text-primary text-xl mb-2">Sube tus documentos</h2>
-              <p className="font-body-md text-body-md text-on-surface-variant text-sm leading-relaxed">
-                Nuestro equipo revisará la documentación en 24–48 horas hábiles. Los documentos obligatorios son necesarios para activar tu perfil.
+            {/* Header */}
+            <header className="mb-6">
+              <h2 className="font-serif font-bold text-[#061b0e] text-2xl mb-1">Documentos del ejemplar</h2>
+              <p className="text-[#737973] text-sm leading-relaxed">
+                Sube los certificados oficiales. Tu equipo de PureMatch los revisa en 24–48 hrs.
               </p>
+            </header>
+
+            {/* Progress bar */}
+            <div className="bg-white border border-[#e4e2e1] rounded-2xl p-4 mb-5 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#fed488]/30 flex items-center justify-center flex-shrink-0">
+                <span className="material-symbols-outlined text-[#775a19] text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>task_alt</span>
+              </div>
+              <div className="flex-grow">
+                <div className="flex items-baseline gap-1">
+                  <p className="font-serif font-bold text-[#061b0e] text-base">{totalDone}/{totalRequired}</p>
+                  <p className="text-[11px] text-[#737973]">documentos obligatorios</p>
+                </div>
+                <div className="mt-1.5 h-1.5 bg-[#f0eded] rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-[#fed488] to-[#775a19] transition-all duration-300"
+                    style={{ width: `${(totalDone / totalRequired) * 100}%` }}
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="flex flex-col gap-4">
+            {/* Dog selector */}
+            {dogs.length > 1 && (
+              <div className="mb-5">
+                <p className="text-[10px] font-bold tracking-[0.1em] text-[#737973] mb-2 ml-1">EJEMPLAR</p>
+                <div className="flex gap-2 flex-wrap">
+                  {dogs.map(dog => (
+                    <button
+                      key={dog.id}
+                      onClick={() => setSelectedDogId(dog.id)}
+                      className={`px-4 py-2 rounded-full border text-[11px] font-bold tracking-[0.06em] transition-all ${
+                        selectedDogId === dog.id
+                          ? 'bg-[#061b0e] text-white border-[#061b0e]'
+                          : 'bg-white text-[#737973] border-[#c3c8c1] hover:border-[#061b0e]'
+                      }`}
+                    >
+                      {dog.name.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Doc zones */}
+            <div className="flex flex-col gap-3">
               {DOC_ZONES.map(zone => {
                 const existing = getDoc(zone.id)
                 const isUploading = uploading[zone.id]
+                const status = existing?.status as keyof typeof STATUS_CONFIG | undefined
+                const cfg = status ? STATUS_CONFIG[status] : null
 
                 return (
-                  <div key={zone.id} className={`border rounded-xl p-5 transition-colors ${existing ? 'bg-surface-container border-primary/40' : 'bg-surface-container-low border-outline-variant'}`}>
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-grow">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-label-caps text-label-caps text-on-surface">{zone.label}</h3>
-                          {zone.required && <span className="text-error font-label-caps text-[10px]">*</span>}
-                        </div>
-                        <p className="font-metadata text-xs text-outline leading-relaxed">{zone.description}</p>
+                  <div key={zone.id} className="bg-white border border-[#e4e2e1] rounded-2xl p-5 transition-colors">
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-xl bg-[#f0eded] flex items-center justify-center flex-shrink-0">
+                        <span className="material-symbols-outlined text-[#1b1c1c] text-[20px]">{zone.icon}</span>
                       </div>
-                      {existing && (
-                        <span className={`font-label-caps text-[10px] px-2 py-1 rounded-full ml-3 flex-shrink-0 ${STATUS_CONFIG[existing.status as keyof typeof STATUS_CONFIG]?.bg} ${STATUS_CONFIG[existing.status as keyof typeof STATUS_CONFIG]?.text}`}>
-                          {STATUS_CONFIG[existing.status as keyof typeof STATUS_CONFIG]?.label}
+                      <div className="flex-grow min-w-0">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <h3 className="font-serif font-bold text-[#061b0e] text-[14px] truncate">{zone.label}</h3>
+                          {zone.required && <span className="text-[#ba1a1a] text-[12px]">*</span>}
+                        </div>
+                        <p className="text-[11px] text-[#737973] leading-relaxed">{zone.description}</p>
+                      </div>
+                      {cfg && (
+                        <span className={`text-[9px] font-bold tracking-[0.1em] ${cfg.bg} ${cfg.text} ${cfg.border} border px-2 py-1 rounded-full flex items-center gap-1 flex-shrink-0`}>
+                          <span className="material-symbols-outlined text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>{cfg.icon}</span>
+                          {cfg.label}
                         </span>
                       )}
                     </div>
 
                     {isUploading ? (
-                      <div className="flex items-center justify-center gap-2 py-4 text-outline">
-                        <span className="material-symbols-outlined text-base animate-spin">progress_activity</span>
-                        <span className="font-label-caps text-[10px]">SUBIENDO...</span>
+                      <div className="flex items-center justify-center gap-2 py-4 bg-[#f0eded] rounded-xl">
+                        <span className="material-symbols-outlined text-[#737973] text-[18px] animate-spin">progress_activity</span>
+                        <span className="text-[10px] font-bold tracking-[0.08em] text-[#737973]">SUBIENDO...</span>
                       </div>
                     ) : existing ? (
                       <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-2 bg-surface-container rounded-lg px-3 py-2 flex-grow min-w-0">
-                          <span className="material-symbols-outlined text-outline text-sm">description</span>
-                          <a href={existing.file_url} target="_blank" rel="noopener noreferrer" className="font-metadata text-xs text-on-surface-variant truncate flex-grow hover:text-primary transition-colors">
-                            Ver documento
-                          </a>
-                        </div>
-                        <button onClick={() => fileInputRefs.current[zone.id]?.click()} className="text-outline hover:text-primary transition-colors p-2" title="Reemplazar">
-                          <span className="material-symbols-outlined text-sm">upload</span>
+                        <a
+                          href={existing.file_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 bg-[#f6f3f2] border border-[#e4e2e1] rounded-xl px-3 py-2.5 flex-grow min-w-0 hover:border-[#061b0e] transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[#737973] text-[16px]">description</span>
+                          <span className="text-[12px] text-[#1b1c1c] truncate flex-grow">Ver documento</span>
+                          <span className="material-symbols-outlined text-[#737973] text-[14px]">open_in_new</span>
+                        </a>
+                        <button
+                          onClick={() => fileInputRefs.current[zone.id]?.click()}
+                          className="w-10 h-10 rounded-xl bg-[#f0eded] hover:bg-[#e4e2e1] text-[#737973] flex items-center justify-center transition-colors"
+                          title="Reemplazar archivo"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">refresh</span>
                         </button>
                       </div>
                     ) : (
                       <button
                         onClick={() => fileInputRefs.current[zone.id]?.click()}
-                        className="w-full border-2 border-dashed border-outline-variant rounded-lg py-6 flex flex-col items-center gap-2 hover:border-primary hover:bg-surface-container transition-colors"
+                        className="w-full border-2 border-dashed border-[#c3c8c1] rounded-xl py-6 flex flex-col items-center gap-1.5 hover:border-[#061b0e] hover:bg-[#f6f3f2] transition-colors"
                       >
-                        <span className="material-symbols-outlined text-outline text-3xl">upload_file</span>
-                        <span className="font-label-caps text-[10px] text-outline">SELECCIONAR ARCHIVO</span>
-                        <span className="font-metadata text-[10px] text-outline-variant">PDF, JPG o PNG · máx. 10 MB</span>
+                        <span className="material-symbols-outlined text-[#737973] text-[28px]">upload_file</span>
+                        <span className="text-[10px] font-bold tracking-[0.08em] text-[#737973]">SELECCIONAR ARCHIVO</span>
+                        <span className="text-[10px] text-[#a0a5a0]">PDF, JPG o PNG · máx. 10 MB</span>
                       </button>
                     )}
 
                     {errors[zone.id] && (
-                      <p className="font-metadata text-[10px] text-error mt-2">{errors[zone.id]}</p>
+                      <p className="text-[11px] text-[#ba1a1a] mt-2 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[14px]">error</span>
+                        {errors[zone.id]}
+                      </p>
                     )}
 
                     <input
@@ -262,33 +310,30 @@ function DocumentsPageInner() {
               })}
             </div>
 
-            <p className="font-metadata text-[10px] text-outline mt-4 text-center">
+            <p className="text-[10px] text-[#a0a5a0] mt-4 text-center">
               * Campos obligatorios para activar el perfil de tu ejemplar.
             </p>
           </>
         )}
       </main>
 
+      {/* Sticky submit bar */}
       {dogs.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-surface border-t border-outline-variant px-4 py-4 z-40">
+        <div className="fixed bottom-0 left-0 right-0 bg-[#fcf9f8]/95 backdrop-blur-sm border-t border-[#c3c8c1]/60 px-4 py-4 z-40">
           <div className="max-w-[680px] mx-auto">
             <button
               onClick={handleSubmit}
               disabled={!requiredDone || submitting}
-              className={`w-full font-label-caps text-label-caps py-4 transition-colors flex items-center justify-center gap-2 ${
+              className={`w-full text-[12px] font-bold tracking-[0.08em] py-3.5 rounded-full transition-colors flex items-center justify-center gap-2 ${
                 requiredDone && !submitting
-                  ? 'bg-primary text-on-primary hover:bg-primary-container cursor-pointer'
-                  : 'bg-surface-container text-outline cursor-not-allowed'
+                  ? 'bg-[#061b0e] text-white hover:bg-[#1b3022]'
+                  : 'bg-[#e4e2e1] text-[#a0a5a0] cursor-not-allowed'
               }`}
             >
-              {submitting ? (
-                <>
-                  <span className="material-symbols-outlined text-base animate-spin">progress_activity</span>
-                  ENVIANDO...
-                </>
-              ) : (
-                'ENVIAR PARA REVISIÓN'
-              )}
+              {submitting
+                ? <><span className="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>ENVIANDO...</>
+                : <>ENVIAR PARA REVISIÓN<span className="material-symbols-outlined text-[16px]">arrow_forward</span></>
+              }
             </button>
           </div>
         </div>
