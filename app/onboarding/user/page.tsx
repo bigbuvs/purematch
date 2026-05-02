@@ -6,7 +6,7 @@ import TopBar from '@/components/TopBar'
 import { insforge } from '@/lib/insforge'
 import { useAuth } from '@/context/AuthContext'
 
-const zones = ['Región Metropolitana','Valparaíso','Biobío','Araucanía','Los Lagos','Antofagasta','Coquimbo','Maule',"O'Higgins",'Atacama']
+const zones = ['Las Condes','Providencia','Vitacura','La Reina','Ñuñoa','Peñalolén','Macul','Otro sector']
 
 export default function OnboardingUserPage() {
   const router = useRouter()
@@ -78,14 +78,14 @@ export default function OnboardingUserPage() {
             ))}
 
             <div className="flex flex-col">
-              <label className="text-[10px] font-bold tracking-[0.1em] text-[#737973] mb-1.5 ml-1">REGIÓN *</label>
+              <label className="text-[10px] font-bold tracking-[0.1em] text-[#737973] mb-1.5 ml-1">SECTOR *</label>
               <div className="relative">
                 <select
                   className="w-full bg-[#fcf9f8] border border-[#c3c8c1] rounded-xl px-4 py-3 text-[14px] text-[#1b1c1c] focus:outline-none focus:border-[#061b0e] transition-colors appearance-none cursor-pointer"
                   value={form.zone}
                   onChange={e => setForm(p => ({ ...p, zone: e.target.value }))}
                 >
-                  <option value="">Selecciona tu región</option>
+                  <option value="">Selecciona tu sector</option>
                   {zones.map(z => <option key={z} value={z}>{z}</option>)}
                 </select>
                 <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-[#737973] pointer-events-none text-[18px]">expand_more</span>

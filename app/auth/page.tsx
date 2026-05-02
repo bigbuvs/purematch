@@ -25,12 +25,25 @@ export default function AuthPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true); setError('')
-    const { error } = await insforge.auth.signUp({
+    const { data, error } = await insforge.auth.signUp({
       email: form.email,
       password: form.password,
       name: form.name,
-    })
+    }) as any
     if (error) { setError(error.message); setLoading(false); return }
+    // Pre-create users record so auth ID is linked even if onboarding is skipped
+    const userId = data?.user?.id ?? data?.id
+    if (userId) {
+      await (insforge.database.from('users').upsert({
+        id: userId,
+        name: form.name || form.email.split('@')[0],
+        email: form.email,
+        phone: null,
+        zone: null,
+        rut: null,
+        avatar_url: null,
+      }) as any).catch(() => {})
+    }
     router.push('/onboarding/user')
   }
 
@@ -134,7 +147,10 @@ export default function AuthPage() {
           </div>
 
           <p className="text-[10px] text-[#a0a5a0] text-center mt-6 leading-relaxed">
-            Al continuar aceptas la política de privacidad.<br/>
+            Al continuar aceptas los{' '}
+            <Link href="/terms" className="underline hover:text-[#061b0e]">términos de uso</Link>
+            {' '}y la{' '}
+            <Link href="/privacy" className="underline hover:text-[#061b0e]">política de privacidad</Link>.<br/>
             Datos protegidos con cifrado SSL.
           </p>
         </div>
