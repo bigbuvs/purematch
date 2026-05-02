@@ -50,9 +50,12 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
+  const ADMIN_EMAILS = ['a@a.com']
+
   useEffect(() => {
     if (authLoading) return
     if (!user) { router.replace('/auth'); return }
+    if (!ADMIN_EMAILS.includes(user.email ?? '')) { router.replace('/explore'); return }
     fetchData()
   }, [user, authLoading])
 
