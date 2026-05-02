@@ -19,6 +19,60 @@ interface MatchCard {
   theirStatus: string
 }
 
+const DEMO_MUTUAL: MatchCard[] = [
+  {
+    id: 'm1',
+    dogName: 'Thor of Golden Peak',
+    breed: 'Golden Retriever',
+    age: '3 años',
+    zone: 'Las Condes, RM',
+    photo: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=600&h=600&fit=crop',
+    unlocked: false,
+    mutual: true,
+    myStatus: 'accepted',
+    theirStatus: 'accepted',
+  },
+  {
+    id: 'm2',
+    dogName: 'Luna von Schwarzwald',
+    breed: 'German Shepherd',
+    age: '4 años',
+    zone: 'Vitacura, RM',
+    photo: 'https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?w=600&h=600&fit=crop',
+    unlocked: true,
+    mutual: true,
+    myStatus: 'accepted',
+    theirStatus: 'accepted',
+  },
+]
+
+const DEMO_PENDING: MatchCard[] = [
+  {
+    id: 'p1',
+    dogName: 'Balto del Sur',
+    breed: 'Husky Siberiano',
+    age: '2 años',
+    zone: 'Ñuñoa, RM',
+    photo: 'https://images.unsplash.com/photo-1605568427561-40dd23c2acea?w=600&h=600&fit=crop',
+    unlocked: false,
+    mutual: false,
+    myStatus: 'accepted',
+    theirStatus: 'pending',
+  },
+  {
+    id: 'p2',
+    dogName: 'Bella di Milano',
+    breed: 'Poodle',
+    age: '1 año',
+    zone: 'Santiago Centro',
+    photo: 'https://images.unsplash.com/photo-1594226801341-41427b4e5c22?w=600&h=600&fit=crop',
+    unlocked: false,
+    mutual: false,
+    myStatus: 'accepted',
+    theirStatus: 'pending',
+  },
+]
+
 export default function MatchesPage() {
   const { user } = useAuth()
   const [tab, setTab] = useState<'mutual' | 'pending'>('mutual')
@@ -27,6 +81,12 @@ export default function MatchesPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (isDemo) {
+      setMutual(DEMO_MUTUAL)
+      setPending(DEMO_PENDING)
+      setLoading(false)
+      return
+    }
     if (!user) return
     const load = async () => {
       const { data: myDogs } = await insforge.database.from('dogs').select('id').eq('owner_id', user.id)
@@ -71,7 +131,7 @@ export default function MatchesPage() {
       setLoading(false)
     }
     load()
-  }, [user])
+  }, [user, isDemo])
 
   const EmptyState = ({ icon, title, desc }: { icon: string; title: string; desc: string }) => (
     <div className="flex flex-col items-center text-center py-20 gap-4">
@@ -211,7 +271,22 @@ export default function MatchesPage() {
           )}
         </div>
       </main>
+
       <BottomNav />
+    </div>
+  )
+}
+
+function EmptyState({ icon, title, desc }: { icon: string; title: string; desc: string }) {
+  return (
+    <div className="flex flex-col items-center text-center py-24 gap-4">
+      <div className="w-16 h-16 bg-[#f0eded] rounded-full flex items-center justify-center">
+        <span className="material-symbols-outlined text-3xl text-[#c3c8c1]">{icon}</span>
+      </div>
+      <div>
+        <p className="font-serif font-semibold text-[#061b0e] mb-1">{title}</p>
+        <p className="text-[#737973] text-sm leading-relaxed max-w-[260px] mx-auto">{desc}</p>
+      </div>
     </div>
   )
 }

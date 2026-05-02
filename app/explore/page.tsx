@@ -4,13 +4,27 @@ import Link from 'next/link'
 import TopBar from '@/components/TopBar'
 import BottomNav from '@/components/BottomNav'
 import { insforge } from '@/lib/insforge'
+import { useAuth } from '@/context/AuthContext'
 import type { Database } from '@/lib/database.types'
 
 type Dog = Database['public']['Tables']['dogs']['Row']
 
+const DEMO_DOGS: Dog[] = [
+  { id: 'd1', owner_id: 'o1', name: 'Arya von Westwood',  breed: 'Border Collie',    age: '2 años', sex: 'Hembra', zone: 'Providencia, RM',  photos: ['https://images.unsplash.com/photo-1589209534004-0c3ec3d8a9e5?w=600&h=800&fit=crop'], pedigree_number: 'KCC-2024-BC-00892', verified: true, created_at: '' },
+  { id: 'd2', owner_id: 'o2', name: 'Thor of Golden Peak', breed: 'Golden Retriever',  age: '3 años', sex: 'Macho', zone: 'Las Condes, RM',   photos: ['https://images.unsplash.com/photo-1552053831-71594a27632d?w=600&h=800&fit=crop'], pedigree_number: 'KCC-2023-GR-01147', verified: true, created_at: '' },
+  { id: 'd3', owner_id: 'o3', name: 'Luna von Schwarzwald', breed: 'German Shepherd', age: '4 años', sex: 'Hembra', zone: 'Vitacura, RM',     photos: ['https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?w=600&h=800&fit=crop'], pedigree_number: 'KCC-2022-GS-00634', verified: true, created_at: '' },
+  { id: 'd4', owner_id: 'o4', name: 'Balto del Sur',       breed: 'Husky Siberiano',  age: '2 años', sex: 'Macho', zone: 'Ñuñoa, RM',        photos: ['https://images.unsplash.com/photo-1605568427561-40dd23c2acea?w=600&h=800&fit=crop'], pedigree_number: 'KCC-2024-HS-00311', verified: true, created_at: '' },
+  { id: 'd5', owner_id: 'o5', name: 'Bella di Milano',     breed: 'Poodle',           age: '1 año',  sex: 'Hembra', zone: 'Santiago Centro',  photos: ['https://images.unsplash.com/photo-1594226801341-41427b4e5c22?w=600&h=800&fit=crop'], pedigree_number: null,                  verified: true, created_at: '' },
+  { id: 'd6', owner_id: 'o6', name: 'Max vom Rhein',       breed: 'German Shepherd',  age: '5 años', sex: 'Macho', zone: 'Maipú, RM',        photos: ['https://images.unsplash.com/photo-1568572933382-74d440642117?w=600&h=800&fit=crop'], pedigree_number: 'KCC-2020-GS-00192', verified: true, created_at: '' },
+]
+
+const ALL_BREEDS = ['Todos', 'Border Collie', 'Golden Retriever', 'Labrador Retriever', 'Poodle', 'Husky Siberiano', 'German Shepherd', 'Beagle', 'Bulldog Inglés', 'Dachshund', 'Chihuahua']
 const breeds = ['Todos', 'Border Collie', 'Golden Retriever', 'Labrador Retriever', 'Poodle', 'Husky Siberiano', 'German Shepherd', 'Beagle', 'Bulldog Inglés']
 
 export default function ExplorePage() {
+  const { user } = useAuth()
+  const isDemo = user?.id === 'demo-user'
+
   const [dogs, setDogs] = useState<Dog[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -18,16 +32,15 @@ export default function ExplorePage() {
   const [sexFilter, setSexFilter] = useState<'Todos' | 'Macho' | 'Hembra'>('Todos')
 
   useEffect(() => {
+    if (isDemo) { setDogs(DEMO_DOGS); setLoading(false); return }
+    insforge.database.from('dogs').select('*').eq('verified', true)
     insforge.database
       .from('dogs')
       .select('*')
       .eq('verified', true)
       .order('created_at', { ascending: false })
-      .then(({ data }) => {
-        setDogs(data ?? [])
-        setLoading(false)
-      })
-  }, [])
+      .then(({ data }) => { setDogs(data ?? []); setLoading(false) })
+  }, [isDemo])
 
   const filtered = dogs.filter(d => {
     const matchBreed = activeBreed === 'Todos' || d.breed === activeBreed
@@ -36,6 +49,9 @@ export default function ExplorePage() {
     const matchSearch = !q || d.name.toLowerCase().includes(q) || d.breed.toLowerCase().includes(q) || (d.zone ?? '').toLowerCase().includes(q)
     return matchBreed && matchSex && matchSearch
   })
+
+  const clearFilters = () => { setSearch(''); setActiveBreed('Todos'); setSexFilter('Todos') }
+  const hasFilters = search || activeBreed !== 'Todos' || sexFilter !== 'Todos'
 
   return (
     <div className="bg-background text-on-background min-h-screen flex flex-col">
@@ -83,8 +99,12 @@ export default function ExplorePage() {
                 {b.toUpperCase()}
               </button>
             ))}
+            {hasFilters && (
+              <button onClick={clearFilters} className="ml-auto text-[10px] text-[#737973] underline underline-offset-2 hover:text-[#061b0e] transition-colors">
+                Limpiar
+              </button>
+            )}
           </div>
-        </div>
 
         <div className="px-4 pt-4">
           {loading ? (
@@ -172,6 +192,7 @@ export default function ExplorePage() {
           )}
         </div>
       </main>
+
       <BottomNav />
     </div>
   )

@@ -1,0 +1,10 @@
+<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="18" cy="18" r="18" fill="#061b0e"/>
+  <!-- Central pad -->
+  <ellipse cx="18" cy="22" rx="6" ry="5" fill="#fed488"/>
+  <!-- Four toe pads -->
+  <circle cx="11.5" cy="15.5" r="2.6" fill="#fed488"/>
+  <circle cx="15.5" cy="12.5" r="2.6" fill="#fed488"/>
+  <circle cx="20.5" cy="12.5" r="2.6" fill="#fed488"/>
+  <circle cx="24.5" cy="15.5" r="2.6" fill="#fed488"/>
+</svg>
