@@ -8,7 +8,7 @@ function hasAuthCookie(request: NextRequest): boolean {
   return request.cookies.has('insforge_csrf_token') || request.cookies.has('purematch_demo')
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   const isAuthenticated = hasAuthCookie(request)
 

@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import TopBar from '@/components/TopBar'
 import { insforge } from '@/lib/insforge'
@@ -16,7 +16,7 @@ interface MatchWithDogs extends Match {
 
 type PayMethod = 'webpay' | 'mercadopago'
 
-export default function UnlockPage() {
+function UnlockContent() {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -229,6 +229,14 @@ export default function UnlockPage() {
         </p>
       </main>
     </div>
+  )
+}
+
+export default function UnlockPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#fcf9f8] flex items-center justify-center"><span className="material-symbols-outlined text-5xl text-[#c3c8c1] animate-spin">progress_activity</span></div>}>
+      <UnlockContent />
+    </Suspense>
   )
 }
 
