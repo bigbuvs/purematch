@@ -25,7 +25,7 @@ const DEMO_MUTUAL: MatchCard[] = [
     dogName: 'Thor of Golden Peak',
     breed: 'Golden Retriever',
     age: '3 años',
-    zone: 'Las Condes, RM',
+    zone: 'Las Condes',
     photo: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=600&h=600&fit=crop',
     unlocked: false,
     mutual: true,
@@ -37,7 +37,7 @@ const DEMO_MUTUAL: MatchCard[] = [
     dogName: 'Luna von Schwarzwald',
     breed: 'German Shepherd',
     age: '4 años',
-    zone: 'Vitacura, RM',
+    zone: 'Vitacura',
     photo: 'https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?w=600&h=600&fit=crop',
     unlocked: true,
     mutual: true,
@@ -52,7 +52,7 @@ const DEMO_PENDING: MatchCard[] = [
     dogName: 'Balto del Sur',
     breed: 'Husky Siberiano',
     age: '2 años',
-    zone: 'Ñuñoa, RM',
+    zone: 'Ñuñoa',
     photo: 'https://images.unsplash.com/photo-1605568427561-40dd23c2acea?w=600&h=600&fit=crop',
     unlocked: false,
     mutual: false,
@@ -64,7 +64,7 @@ const DEMO_PENDING: MatchCard[] = [
     dogName: 'Bella di Milano',
     breed: 'Poodle',
     age: '1 año',
-    zone: 'Santiago Centro',
+    zone: 'Providencia',
     photo: 'https://images.unsplash.com/photo-1594226801341-41427b4e5c22?w=600&h=600&fit=crop',
     unlocked: false,
     mutual: false,
@@ -72,6 +72,20 @@ const DEMO_PENDING: MatchCard[] = [
     theirStatus: 'pending',
   },
 ]
+
+function EmptyState({ icon, title, desc }: { icon: string; title: string; desc: string }) {
+  return (
+    <div className="flex flex-col items-center text-center py-24 gap-4">
+      <div className="w-16 h-16 bg-[#f0eded] rounded-full flex items-center justify-center">
+        <span className="material-symbols-outlined text-3xl text-[#c3c8c1]">{icon}</span>
+      </div>
+      <div>
+        <p className="font-serif font-semibold text-[#061b0e] mb-1">{title}</p>
+        <p className="text-[#737973] text-sm leading-relaxed max-w-[260px] mx-auto">{desc}</p>
+      </div>
+    </div>
+  )
+}
 
 export default function MatchesPage() {
   const { user } = useAuth()
@@ -88,7 +102,8 @@ export default function MatchesPage() {
       setLoading(false)
       return
     }
-    if (!user) return
+    if (!user) { setLoading(false); return }
+
     const load = async () => {
       const { data: myDogs } = await insforge.database.from('dogs').select('id').eq('owner_id', user.id)
       if (!myDogs?.length) { setLoading(false); return }
@@ -134,25 +149,13 @@ export default function MatchesPage() {
     load()
   }, [user, isDemo])
 
-  const EmptyState = ({ icon, title, desc }: { icon: string; title: string; desc: string }) => (
-    <div className="flex flex-col items-center text-center py-20 gap-4">
-      <div className="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center">
-        <span className="material-symbols-outlined text-3xl text-outline-variant">{icon}</span>
-      </div>
-      <div>
-        <p className="font-serif font-semibold text-primary mb-1">{title}</p>
-        <p className="text-on-surface-variant text-sm leading-relaxed max-w-[260px] mx-auto">{desc}</p>
-      </div>
-    </div>
-  )
-
   return (
-    <div className="bg-background text-on-background min-h-screen flex flex-col">
+    <div className="bg-[#fcf9f8] min-h-screen flex flex-col">
       <TopBar title="Matches" />
       <main className="flex-grow pb-[80px] max-w-[680px] mx-auto w-full">
 
         {/* Tabs */}
-        <div className="flex border-b border-outline-variant bg-surface sticky top-[60px] z-30">
+        <div className="flex border-b border-[#c3c8c1]/60 bg-[#fcf9f8] sticky top-[60px] z-30">
           {([
             { key: 'mutual',  label: 'Mutuos',     count: mutual.length  },
             { key: 'pending', label: 'Pendientes',  count: pending.length },
@@ -160,10 +163,14 @@ export default function MatchesPage() {
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
-              className={`flex-1 py-3.5 font-label-caps text-[11px] tracking-[0.08em] flex items-center justify-center gap-2 transition-colors border-b-2 ${tab === t.key ? 'border-primary text-primary' : 'border-transparent text-outline hover:text-on-surface'}`}
+              className={`flex-1 py-3.5 text-[11px] tracking-[0.08em] font-semibold flex items-center justify-center gap-2 transition-colors border-b-2 ${
+                tab === t.key ? 'border-[#061b0e] text-[#061b0e]' : 'border-transparent text-[#a0a5a0] hover:text-[#1b1c1c]'
+              }`}
             >
               {t.label.toUpperCase()}
-              <span className={`text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold ${tab === t.key ? 'bg-primary text-on-primary' : 'bg-surface-container text-outline'}`}>
+              <span className={`text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold ${
+                tab === t.key ? 'bg-[#061b0e] text-white' : 'bg-[#f0eded] text-[#737973]'
+              }`}>
                 {t.count}
               </span>
             </button>
@@ -173,8 +180,8 @@ export default function MatchesPage() {
         <div className="px-4 pt-5">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-24 gap-3">
-              <span className="material-symbols-outlined text-5xl text-outline-variant animate-spin">progress_activity</span>
-              <p className="font-label-caps text-[10px] text-outline tracking-[0.1em]">CARGANDO MATCHES...</p>
+              <span className="material-symbols-outlined text-5xl text-[#c3c8c1] animate-spin">progress_activity</span>
+              <p className="text-[10px] font-semibold tracking-[0.1em] text-[#737973]">CARGANDO MATCHES...</p>
             </div>
           ) : (
             <>
@@ -183,42 +190,37 @@ export default function MatchesPage() {
                   {mutual.length === 0
                     ? <EmptyState icon="handshake" title="Sin matches mutuos aún" desc="Cuando ambas partes acepten, aparecerá aquí el contacto." />
                     : mutual.map(m => (
-                        <div key={m.id} className="bg-surface border border-outline-variant rounded-2xl overflow-hidden">
-                          <div className="flex gap-0">
-                            {/* Photo */}
-                            <div className="w-28 h-28 flex-shrink-0 bg-surface-container relative overflow-hidden">
+                        <div key={m.id} className="bg-white border border-[#e4e2e1] rounded-2xl overflow-hidden shadow-[0_2px_8px_rgba(6,27,14,0.04)]">
+                          <div className="flex">
+                            <div className="w-28 h-28 flex-shrink-0 bg-[#f0eded] relative overflow-hidden">
                               {m.photo
                                 ? <img src={m.photo} alt={m.dogName} className="w-full h-full object-cover" />
                                 : <div className="w-full h-full flex items-center justify-center">
-                                    <span className="material-symbols-outlined text-4xl text-outline-variant" style={{ fontVariationSettings: "'FILL' 1" }}>pets</span>
+                                    <span className="material-symbols-outlined text-4xl text-[#c3c8c1]" style={{ fontVariationSettings: "'FILL' 1" }}>pets</span>
                                   </div>
                               }
                             </div>
-
-                            {/* Info */}
                             <div className="flex flex-col justify-between flex-grow min-w-0 p-4">
                               <div>
                                 <div className="flex items-center gap-1.5 mb-0.5">
-                                  <span className="material-symbols-outlined text-sm text-green-700" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
-                                  <span className="font-label-caps text-[9px] text-green-700 tracking-[0.1em]">MATCH MUTUO</span>
+                                  <span className="material-symbols-outlined text-sm text-[#1b5e20]" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+                                  <span className="text-[9px] font-bold text-[#1b5e20] tracking-[0.1em]">MATCH MUTUO</span>
                                 </div>
-                                <h3 className="font-serif font-semibold text-primary text-base truncate">{m.dogName}</h3>
-                                <p className="font-metadata text-xs text-outline">{m.breed}{m.age ? ` · ${m.age}` : ''}</p>
+                                <h3 className="font-serif font-semibold text-[#061b0e] text-base truncate">{m.dogName}</h3>
+                                <p className="text-xs text-[#737973]">{m.breed}{m.age ? ` · ${m.age}` : ''}</p>
                                 {m.zone && (
                                   <div className="flex items-center gap-1 mt-1">
-                                    <span className="material-symbols-outlined text-outline text-xs">location_on</span>
-                                    <span className="font-metadata text-xs text-outline">{m.zone}</span>
+                                    <span className="material-symbols-outlined text-[#a0a5a0] text-xs">location_on</span>
+                                    <span className="text-xs text-[#a0a5a0]">{m.zone}</span>
                                   </div>
                                 )}
                               </div>
                             </div>
                           </div>
-
-                          {/* Contact action */}
-                          <div className="border-t border-outline-variant px-4 py-3">
+                          <div className="border-t border-[#e4e2e1] px-4 py-3">
                             <Link
                               href={`/unlock?match_id=${m.id}`}
-                              className={`flex items-center gap-2 font-label-caps text-[10px] tracking-[0.08em] transition-colors ${m.unlocked ? 'text-primary' : 'text-secondary hover:text-on-secondary-fixed-variant'}`}
+                              className="flex items-center gap-2 text-[10px] tracking-[0.08em] font-semibold text-[#061b0e] hover:text-[#1b3022] transition-colors"
                             >
                               <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
                                 {m.unlocked ? 'contact_phone' : 'lock_open'}
@@ -238,29 +240,26 @@ export default function MatchesPage() {
                   {pending.length === 0
                     ? <EmptyState icon="schedule" title="Sin solicitudes pendientes" desc="Las solicitudes que envíes y aún no tienen respuesta aparecerán aquí." />
                     : pending.map(m => (
-                        <div key={m.id} className="bg-surface border border-outline-variant rounded-2xl overflow-hidden">
-                          <div className="flex gap-0">
-                            <div className="w-28 h-28 flex-shrink-0 bg-surface-container relative overflow-hidden">
+                        <div key={m.id} className="bg-white border border-[#e4e2e1] rounded-2xl overflow-hidden shadow-[0_2px_8px_rgba(6,27,14,0.04)]">
+                          <div className="flex">
+                            <div className="w-28 h-28 flex-shrink-0 bg-[#f0eded] relative overflow-hidden">
                               {m.photo
                                 ? <>
-                                    <img src={m.photo} alt={m.dogName} className="w-full h-full object-cover opacity-60" />
-                                    <div className="absolute inset-0 bg-surface/40 backdrop-blur-[2px]" />
+                                    <img src={m.photo} alt={m.dogName} className="w-full h-full object-cover opacity-50" />
+                                    <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]" />
                                   </>
                                 : <div className="w-full h-full flex items-center justify-center">
-                                    <span className="material-symbols-outlined text-4xl text-outline-variant" style={{ fontVariationSettings: "'FILL' 1" }}>pets</span>
+                                    <span className="material-symbols-outlined text-4xl text-[#c3c8c1]" style={{ fontVariationSettings: "'FILL' 1" }}>pets</span>
                                   </div>
                               }
                               <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="material-symbols-outlined text-outline text-2xl">schedule</span>
+                                <span className="material-symbols-outlined text-[#737973] text-2xl">schedule</span>
                               </div>
                             </div>
-
                             <div className="flex flex-col justify-center flex-grow min-w-0 p-4">
-                              <div className="flex items-center gap-1.5 mb-0.5">
-                                <span className="font-label-caps text-[9px] text-outline tracking-[0.1em]">ESPERANDO RESPUESTA</span>
-                              </div>
-                              <h3 className="font-serif font-semibold text-primary text-base truncate">{m.dogName}</h3>
-                              <p className="font-metadata text-xs text-outline">{m.breed}</p>
+                              <span className="text-[9px] font-bold text-[#a0a5a0] tracking-[0.1em] mb-1">ESPERANDO RESPUESTA</span>
+                              <h3 className="font-serif font-semibold text-[#061b0e] text-base truncate">{m.dogName}</h3>
+                              <p className="text-xs text-[#737973]">{m.breed}{m.age ? ` · ${m.age}` : ''}</p>
                             </div>
                           </div>
                         </div>
@@ -272,22 +271,7 @@ export default function MatchesPage() {
           )}
         </div>
       </main>
-
       <BottomNav />
-    </div>
-  )
-}
-
-function EmptyState({ icon, title, desc }: { icon: string; title: string; desc: string }) {
-  return (
-    <div className="flex flex-col items-center text-center py-24 gap-4">
-      <div className="w-16 h-16 bg-[#f0eded] rounded-full flex items-center justify-center">
-        <span className="material-symbols-outlined text-3xl text-[#c3c8c1]">{icon}</span>
-      </div>
-      <div>
-        <p className="font-serif font-semibold text-[#061b0e] mb-1">{title}</p>
-        <p className="text-[#737973] text-sm leading-relaxed max-w-[260px] mx-auto">{desc}</p>
-      </div>
     </div>
   )
 }
