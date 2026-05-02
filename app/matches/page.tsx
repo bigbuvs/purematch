@@ -9,6 +9,7 @@ import { useAuth } from '@/context/AuthContext'
 interface MatchCard {
   id: string
   matchId: string
+  otherDogId: string
   dogName: string
   breed: string
   age: string
@@ -24,17 +25,17 @@ interface MatchCard {
 // ── Demo data ────────────────────────────────────────────────────────────────
 
 const DEMO_MUTUAL: MatchCard[] = [
-  { id: 'm1', matchId: 'm1', dogName: 'Thor of Golden Peak', breed: 'Golden Retriever', age: '3 años', zone: 'Las Condes', photo: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=600&h=600&fit=crop', unlocked: false, mutual: true, myStatus: 'accepted', theirStatus: 'accepted', iAmA: true },
-  { id: 'm2', matchId: 'm2', dogName: 'Luna von Schwarzwald', breed: 'German Shepherd', age: '4 años', zone: 'Vitacura', photo: 'https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?w=600&h=600&fit=crop', unlocked: true, mutual: true, myStatus: 'accepted', theirStatus: 'accepted', iAmA: false },
+  { id: 'm1', matchId: 'm1', otherDogId: '', dogName: 'Thor of Golden Peak', breed: 'Golden Retriever', age: '3 años', zone: 'Las Condes', photo: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=600&h=600&fit=crop', unlocked: false, mutual: true, myStatus: 'accepted', theirStatus: 'accepted', iAmA: true },
+  { id: 'm2', matchId: 'm2', otherDogId: '', dogName: 'Luna von Schwarzwald', breed: 'German Shepherd', age: '4 años', zone: 'Vitacura', photo: 'https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?w=600&h=600&fit=crop', unlocked: true, mutual: true, myStatus: 'accepted', theirStatus: 'accepted', iAmA: false },
 ]
 
 const DEMO_SENT: MatchCard[] = [
-  { id: 'p1', matchId: 'p1', dogName: 'Balto del Sur', breed: 'Husky Siberiano', age: '2 años', zone: 'Ñuñoa', photo: 'https://images.unsplash.com/photo-1605568427561-40dd23c2acea?w=600&h=600&fit=crop', unlocked: false, mutual: false, myStatus: 'accepted', theirStatus: 'pending', iAmA: true },
+  { id: 'p1', matchId: 'p1', otherDogId: '', dogName: 'Balto del Sur', breed: 'Husky Siberiano', age: '2 años', zone: 'Ñuñoa', photo: 'https://images.unsplash.com/photo-1605568427561-40dd23c2acea?w=600&h=600&fit=crop', unlocked: false, mutual: false, myStatus: 'accepted', theirStatus: 'pending', iAmA: true },
 ]
 
 const DEMO_INCOMING: MatchCard[] = [
-  { id: 'r1', matchId: 'r1', dogName: 'Bella di Milano', breed: 'Poodle', age: '1 año', zone: 'Providencia', photo: 'https://images.unsplash.com/photo-1594226801341-41427b4e5c22?w=600&h=600&fit=crop', unlocked: false, mutual: false, myStatus: 'pending', theirStatus: 'accepted', iAmA: false },
-  { id: 'r2', matchId: 'r2', dogName: 'Max von Bayern', breed: 'Rottweiler', age: '5 años', zone: 'La Reina', photo: 'https://images.unsplash.com/photo-1568572933382-74d440642117?w=600&h=600&fit=crop', unlocked: false, mutual: false, myStatus: 'pending', theirStatus: 'accepted', iAmA: false },
+  { id: 'r1', matchId: 'r1', otherDogId: '', dogName: 'Bella di Milano', breed: 'Poodle', age: '1 año', zone: 'Providencia', photo: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600&h=600&fit=crop', unlocked: false, mutual: false, myStatus: 'pending', theirStatus: 'accepted', iAmA: false },
+  { id: 'r2', matchId: 'r2', otherDogId: '', dogName: 'Max von Bayern', breed: 'Rottweiler', age: '5 años', zone: 'La Reina', photo: 'https://images.unsplash.com/photo-1568572933382-74d440642117?w=600&h=600&fit=crop', unlocked: false, mutual: false, myStatus: 'pending', theirStatus: 'accepted', iAmA: false },
 ]
 
 // ── Empty state ───────────────────────────────────────────────────────────────
@@ -99,6 +100,7 @@ export default function MatchesPage() {
       const card: MatchCard = {
         id: m.id,
         matchId: m.id,
+        otherDogId: (other as any).id ?? '',
         dogName: (other as any).name,
         breed:   (other as any).breed,
         age:     (other as any).age ?? '',
@@ -220,26 +222,37 @@ export default function MatchesPage() {
                               )}
                             </div>
                           </div>
-                          <div className="border-t border-[#e4e2e1] px-4 py-3 flex gap-2">
-                            <button
-                              disabled={responding === m.matchId}
-                              onClick={() => handleRespond(m, false)}
-                              className="flex-1 border border-[#e4e2e1] text-[#737973] text-[10px] font-bold tracking-[0.08em] py-2.5 rounded-full hover:border-[#ba1a1a] hover:text-[#ba1a1a] transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
-                            >
-                              <span className="material-symbols-outlined text-sm">close</span>
-                              RECHAZAR
-                            </button>
-                            <button
-                              disabled={responding === m.matchId}
-                              onClick={() => handleRespond(m, true)}
-                              className="flex-1 bg-[#061b0e] text-white text-[10px] font-bold tracking-[0.08em] py-2.5 rounded-full hover:bg-[#1b3022] transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
-                            >
-                              {responding === m.matchId
-                                ? <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
-                                : <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
-                              }
-                              ACEPTAR
-                            </button>
+                          <div className="border-t border-[#e4e2e1] px-4 py-3 flex flex-col gap-2">
+                            <div className="flex gap-2">
+                              <button
+                                disabled={responding === m.matchId}
+                                onClick={() => handleRespond(m, false)}
+                                className="flex-1 border border-[#e4e2e1] text-[#737973] text-[10px] font-bold tracking-[0.08em] py-2.5 rounded-full hover:border-[#ba1a1a] hover:text-[#ba1a1a] transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+                              >
+                                <span className="material-symbols-outlined text-sm">close</span>
+                                RECHAZAR
+                              </button>
+                              <button
+                                disabled={responding === m.matchId}
+                                onClick={() => handleRespond(m, true)}
+                                className="flex-1 bg-[#061b0e] text-white text-[10px] font-bold tracking-[0.08em] py-2.5 rounded-full hover:bg-[#1b3022] transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+                              >
+                                {responding === m.matchId
+                                  ? <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+                                  : <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+                                }
+                                ACEPTAR
+                              </button>
+                            </div>
+                            {m.otherDogId && !isDemo && (
+                              <Link
+                                href={`/dog/${m.otherDogId}`}
+                                className="flex items-center justify-center gap-1.5 text-[10px] font-bold tracking-[0.08em] text-[#737973] hover:text-[#061b0e] transition-colors py-1"
+                              >
+                                <span className="material-symbols-outlined text-sm">open_in_new</span>
+                                VER PERFIL COMPLETO
+                              </Link>
+                            )}
                           </div>
                         </div>
                       ))
@@ -280,7 +293,7 @@ export default function MatchesPage() {
                               </div>
                             </div>
                           </div>
-                          <div className="border-t border-[#e4e2e1] px-4 py-3">
+                          <div className="border-t border-[#e4e2e1] px-4 py-3 flex flex-col gap-2">
                             <Link
                               href={`/unlock?match_id=${m.id}`}
                               className="flex items-center gap-2 text-[10px] tracking-[0.08em] font-semibold text-[#061b0e] hover:text-[#1b3022] transition-colors"
@@ -291,6 +304,15 @@ export default function MatchesPage() {
                               {m.unlocked ? 'VER DATOS DE CONTACTO' : 'DESBLOQUEAR CONTACTO · $9.990'}
                               {!m.unlocked && <span className="material-symbols-outlined text-xs ml-auto">arrow_forward</span>}
                             </Link>
+                            {m.otherDogId && !isDemo && (
+                              <Link
+                                href={`/dog/${m.otherDogId}`}
+                                className="flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.08em] text-[#737973] hover:text-[#061b0e] transition-colors"
+                              >
+                                <span className="material-symbols-outlined text-sm">pets</span>
+                                VER PERFIL COMPLETO DEL EJEMPLAR
+                              </Link>
+                            )}
                           </div>
                         </div>
                       ))
@@ -327,7 +349,7 @@ export default function MatchesPage() {
                               <p className="text-xs text-[#737973]">{m.breed}{m.age ? ` · ${m.age}` : ''}</p>
                             </div>
                           </div>
-                          <div className="border-t border-[#e4e2e1] px-4 py-3">
+                          <div className="border-t border-[#e4e2e1] px-4 py-3 flex items-center justify-between">
                             <button
                               disabled={responding === m.matchId || isDemo}
                               onClick={() => handleRespond(m, false)}
@@ -336,6 +358,15 @@ export default function MatchesPage() {
                               <span className="material-symbols-outlined text-sm">close</span>
                               CANCELAR SOLICITUD
                             </button>
+                            {m.otherDogId && !isDemo && (
+                              <Link
+                                href={`/dog/${m.otherDogId}`}
+                                className="flex items-center gap-1 text-[10px] font-semibold tracking-[0.08em] text-[#737973] hover:text-[#061b0e] transition-colors"
+                              >
+                                <span className="material-symbols-outlined text-sm">open_in_new</span>
+                                VER PERFIL
+                              </Link>
+                            )}
                           </div>
                         </div>
                       ))

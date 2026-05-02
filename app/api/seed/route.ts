@@ -35,7 +35,7 @@ const BACKGROUND_DOGS = [
     sex: 'Hembra' as const,
     zone: 'Las Condes',
     pedigree_number: null,
-    photos: ['https://images.unsplash.com/photo-1594226801341-41427b4e5c22?w=800&h=1000&fit=crop'],
+    photos: ['https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=800&h=1000&fit=crop'],
   },
   {
     name: 'Max vom Rhein',

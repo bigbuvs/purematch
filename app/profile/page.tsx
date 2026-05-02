@@ -68,10 +68,10 @@ export default function ProfilePage() {
     <div className="bg-[#fcf9f8] min-h-screen flex flex-col">
       <TopBar title="Mi Perfil" />
 
-      <main className="flex-grow pb-[100px] max-w-[680px] mx-auto w-full">
+      <main className="flex-grow pb-[120px] max-w-[680px] mx-auto w-full">
 
         {/* Hero */}
-        <div className="relative bg-gradient-to-b from-[#061b0e] to-[#1b3022] text-white px-5 pt-8 pb-16">
+        <div className="relative bg-gradient-to-b from-[#061b0e] to-[#1b3022] text-white px-5 pt-8 pb-6">
           <div className="flex items-center gap-4">
             <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-[#fed488] bg-[#1b3022] flex items-center justify-center shadow-lg flex-shrink-0">
               {avatarUrl
@@ -89,16 +89,32 @@ export default function ProfilePage() {
               )}
             </div>
           </div>
-        </div>
 
-        {/* Stat cards (overlapping hero) */}
-        <div className="px-4 -mt-10 grid grid-cols-2 gap-3">
-          <StatCard icon="pets" label="Perros" value={loading ? '—' : dogs.length} />
-          <StatCard icon="handshake" label="Matches" value={loading ? '—' : matchCount} />
+          {/* Stat row inside hero — clean, no overlap */}
+          <div className="grid grid-cols-2 gap-3 mt-6">
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl px-4 py-3 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[#fed488]/20 flex items-center justify-center flex-shrink-0">
+                <span className="material-symbols-outlined text-[#fed488] text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>pets</span>
+              </div>
+              <div>
+                <p className="font-serif font-bold text-white text-xl leading-none">{loading ? '—' : dogs.length}</p>
+                <p className="text-[10px] font-bold tracking-[0.1em] text-white/50 mt-1">PERROS</p>
+              </div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl px-4 py-3 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[#fed488]/20 flex items-center justify-center flex-shrink-0">
+                <span className="material-symbols-outlined text-[#fed488] text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>handshake</span>
+              </div>
+              <div>
+                <p className="font-serif font-bold text-white text-xl leading-none">{loading ? '—' : matchCount}</p>
+                <p className="text-[10px] font-bold tracking-[0.1em] text-white/50 mt-1">MATCHES</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Tabs */}
-        <div className="px-4 mt-6">
+        <div className="px-4 mt-5">
           <div className="bg-white border border-[#e4e2e1] rounded-full p-1 flex">
             {[
               { key: 'dogs', label: 'Mis perros' },
@@ -219,16 +235,3 @@ export default function ProfilePage() {
   )
 }
 
-function StatCard({ icon, label, value }: { icon: string; label: string; value: string | number }) {
-  return (
-    <div className="bg-white border border-[#e4e2e1] rounded-2xl px-4 py-4 shadow-[0_4px_16px_rgba(6,27,14,0.08)] flex items-center gap-3">
-      <div className="w-10 h-10 rounded-xl bg-[#fed488]/30 flex items-center justify-center flex-shrink-0">
-        <span className="material-symbols-outlined text-[#775a19] text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>{icon}</span>
-      </div>
-      <div className="min-w-0">
-        <p className="font-serif font-bold text-[#061b0e] text-2xl leading-none">{value}</p>
-        <p className="text-[10px] font-bold tracking-[0.1em] text-[#737973] mt-1">{label.toUpperCase()}</p>
-      </div>
-    </div>
-  )
-}

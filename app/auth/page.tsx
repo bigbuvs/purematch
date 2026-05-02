@@ -3,9 +3,11 @@ import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { insforge } from '@/lib/insforge'
+import { useAuth } from '@/context/AuthContext'
 
 function AuthContent() {
   const router = useRouter()
+  const { refresh } = useAuth()
   const searchParams = useSearchParams()
   const next = searchParams.get('next') || '/explore'
   const [tab, setTab] = useState<'login' | 'register'>('login')
@@ -19,6 +21,7 @@ function AuthContent() {
     setLoading(true); setError('')
     const { error } = await insforge.auth.signInWithPassword({ email: form.email, password: form.password })
     if (error) { setError(error.message); setLoading(false); return }
+    await refresh()
     router.push(next)
   }
 
@@ -44,6 +47,7 @@ function AuthContent() {
         avatar_url: null,
       }) as any).catch(() => {})
     }
+    await refresh()
     router.push('/onboarding/user')
   }
 
