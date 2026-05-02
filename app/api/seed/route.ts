@@ -30,12 +30,12 @@ const BACKGROUND_DOGS = [
   },
   {
     name: 'Bella di Milano',
-    breed: 'Poodle',
+    breed: 'Bulldog Inglés',
     age: '1 año',
     sex: 'Hembra' as const,
     zone: 'Las Condes',
     pedigree_number: null,
-    photos: ['https://images.unsplash.com/photo-1574158622682-e40e69881006?w=800&h=1000&fit=crop'],
+    photos: ['https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=800&h=1000&fit=crop'],
   },
   {
     name: 'Max vom Rhein',
