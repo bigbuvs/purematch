@@ -75,6 +75,7 @@ const DEMO_PENDING: MatchCard[] = [
 
 export default function MatchesPage() {
   const { user } = useAuth()
+  const isDemo = user?.id === 'demo-user'
   const [tab, setTab] = useState<'mutual' | 'pending'>('mutual')
   const [mutual, setMutual] = useState<MatchCard[]>([])
   const [pending, setPending] = useState<MatchCard[]>([])
