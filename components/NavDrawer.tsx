@@ -2,7 +2,6 @@
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { useAuth } from '@/context/AuthContext'
-import { insforge } from '@/lib/insforge'
 import { useRouter } from 'next/navigation'
 
 const APP_LINKS = [
@@ -26,7 +25,7 @@ const LANDING_LINKS = [
 ]
 
 export default function NavDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { user } = useAuth()
+  const { user, signOut } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
@@ -46,7 +45,7 @@ export default function NavDrawer({ open, onClose }: { open: boolean; onClose: (
 
   const handleSignOut = async () => {
     onClose()
-    await insforge.auth.signOut()
+    await signOut()
     router.replace('/')
   }
 

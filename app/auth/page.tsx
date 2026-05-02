@@ -16,11 +16,14 @@ function AuthContent() {
   const [error, setError] = useState('')
   const [form, setForm] = useState({ name: '', email: '', password: '' })
 
+  const clearDemo = () => { document.cookie = 'purematch_demo=; path=/; max-age=0' }
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true); setError('')
     const { error } = await insforge.auth.signInWithPassword({ email: form.email, password: form.password })
     if (error) { setError(error.message); setLoading(false); return }
+    clearDemo()
     await refresh()
     router.push(next)
   }
@@ -47,6 +50,7 @@ function AuthContent() {
         avatar_url: null,
       }) as any).catch(() => {})
     }
+    clearDemo()
     await refresh()
     router.push('/onboarding/user')
   }

@@ -54,23 +54,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   const refresh = async () => {
+    // Real session takes priority: check it first regardless of demo cookie
+    if (hasCookie('insforge_csrf_token')) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data } = await withTimeout(insforge.auth.getCurrentUser() as Promise<any>, 5000)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const u = (data as any)?.user ?? data ?? null
+        if (u) {
+          // Clear stale demo cookie so it doesn't interfere
+          document.cookie = 'purematch_demo=; path=/; max-age=0'
+          setUser(u as User | null)
+          return
+        }
+      } catch {}
+    }
+    // Fall back to demo mode
     if (hasCookie('purematch_demo')) {
       setUser(DEMO_USER)
       return
     }
-    if (!hasCookie('insforge_csrf_token')) {
-      setUser(null)
-      return
-    }
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data } = await withTimeout(insforge.auth.getCurrentUser() as Promise<any>, 5000)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const u = (data as any)?.user ?? data ?? null
-      setUser(u as User | null)
-    } catch {
-      setUser(null)
-    }
+    setUser(null)
   }
 
   useEffect(() => {
