@@ -34,7 +34,7 @@ const DEMO_SENT: MatchCard[] = [
 ]
 
 const DEMO_INCOMING: MatchCard[] = [
-  { id: 'r1', matchId: 'r1', otherDogId: '', dogName: 'Bella di Milano', breed: 'Poodle', age: '1 año', zone: 'Providencia', photo: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600&h=600&fit=crop', unlocked: false, mutual: false, myStatus: 'pending', theirStatus: 'accepted', iAmA: false },
+  { id: 'r1', matchId: 'r1', otherDogId: '', dogName: 'Bella di Milano', breed: 'Poodle', age: '1 año', zone: 'Providencia', photo: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=600&h=600&fit=crop', unlocked: false, mutual: false, myStatus: 'pending', theirStatus: 'accepted', iAmA: false },
   { id: 'r2', matchId: 'r2', otherDogId: '', dogName: 'Max von Bayern', breed: 'Rottweiler', age: '5 años', zone: 'La Reina', photo: 'https://images.unsplash.com/photo-1568572933382-74d440642117?w=600&h=600&fit=crop', unlocked: false, mutual: false, myStatus: 'pending', theirStatus: 'accepted', iAmA: false },
 ]
 

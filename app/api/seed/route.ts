@@ -35,7 +35,7 @@ const BACKGROUND_DOGS = [
     sex: 'Hembra' as const,
     zone: 'Las Condes',
     pedigree_number: null,
-    photos: ['https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=800&h=1000&fit=crop'],
+    photos: ['https://images.unsplash.com/photo-1574158622682-e40e69881006?w=800&h=1000&fit=crop'],
   },
   {
     name: 'Max vom Rhein',
@@ -70,7 +70,7 @@ const TEST_ACCOUNTS = [
       sex: 'Hembra' as const,
       zone: 'Las Condes',
       pedigree_number: 'KCC-2024-BC-00892',
-      photos: ['https://images.unsplash.com/photo-1589209534004-0c3ec3d8a9e5?w=800&h=1000&fit=crop'],
+      photos: ['https://images.unsplash.com/photo-1503256207526-0d5523f31ed4?w=800&h=1000&fit=crop'],
     },
   },
   {

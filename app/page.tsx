@@ -8,13 +8,13 @@ import NavDrawer from '@/components/NavDrawer'
 const HERO_IMG = 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1920&q=80'
 
 const featuredDogs = [
-  { name: 'Arya von Westwood',   breed: 'Border Collie',   age: '2 años', sex: 'Hembra', zone: 'Providencia, RM', img: 'https://images.unsplash.com/photo-1589209534004-0c3ec3d8a9e5?auto=format&fit=crop&w=600&h=600&q=80', kcc: 'KCC-2024-BC-00892' },
+  { name: 'Arya von Westwood',   breed: 'Border Collie',   age: '2 años', sex: 'Hembra', zone: 'Providencia, RM', img: 'https://images.unsplash.com/photo-1503256207526-0d5523f31ed4?auto=format&fit=crop&w=600&h=600&q=80', kcc: 'KCC-2024-BC-00892' },
   { name: 'Thor of Golden Peak', breed: 'Golden Retriever', age: '3 años', sex: 'Macho',  zone: 'Las Condes, RM',  img: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=600&h=600&q=80', kcc: 'KCC-2023-GR-01147' },
   { name: 'Luna von Schwarzwald',breed: 'German Shepherd',  age: '4 años', sex: 'Hembra', zone: 'Vitacura, RM',    img: 'https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?auto=format&fit=crop&w=600&h=600&q=80', kcc: 'KCC-2022-GS-00634' },
 ]
 
 const breeds = [
-  { name: 'Border Collie',   img: 'https://images.unsplash.com/photo-1589209534004-0c3ec3d8a9e5?auto=format&fit=crop&w=400&h=300&q=80' },
+  { name: 'Border Collie',   img: 'https://images.unsplash.com/photo-1503256207526-0d5523f31ed4?auto=format&fit=crop&w=400&h=300&q=80' },
   { name: 'Golden Retriever',img: 'https://images.unsplash.com/photo-1534361960057-19f4434a78d9?auto=format&fit=crop&w=400&h=300&q=80' },
   { name: 'Husky Siberiano', img: 'https://images.unsplash.com/photo-1605568427561-40dd23c2acea?auto=format&fit=crop&w=400&h=300&q=80' },
   { name: 'German Shepherd', img: 'https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?auto=format&fit=crop&w=400&h=300&q=80' },

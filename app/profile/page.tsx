@@ -12,7 +12,7 @@ type Dog = Database['public']['Tables']['dogs']['Row']
 
 const DEMO_DOGS: Dog[] = [
   { id: 'demo-d1', owner_id: 'demo-user', name: 'Arya von Westwood', breed: 'Border Collie', age: '2 años', sex: 'Hembra', zone: 'Providencia, RM',
-    photos: ['https://images.unsplash.com/photo-1589209534004-0c3ec3d8a9e5?w=400&h=400&fit=crop'], pedigree_number: 'KCC-2024-BC-00892', verified: true, score: 95, created_at: '' },
+    photos: ['https://images.unsplash.com/photo-1503256207526-0d5523f31ed4?w=400&h=400&fit=crop'], pedigree_number: 'KCC-2024-BC-00892', verified: true, score: 95, created_at: '' },
   { id: 'demo-d2', owner_id: 'demo-user', name: 'Thor of Golden Peak', breed: 'Golden Retriever', age: '3 años', sex: 'Macho', zone: 'Las Condes, RM',
     photos: ['https://images.unsplash.com/photo-1552053831-71594a27632d?w=400&h=400&fit=crop'], pedigree_number: 'KCC-2023-GR-01147', verified: true, score: 95, created_at: '' },
 ]
