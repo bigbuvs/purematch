@@ -122,8 +122,8 @@ export default function ProfilePage() {
           {tab === 'dogs' && (
             <div className="flex flex-col gap-3">
               {dogs.map(dog => (
-                <Link key={dog.id} href={isDemo ? '#' : `/dog/${dog.id}`} className="block group">
-                  <div className="bg-white border border-[#e4e2e1] rounded-2xl overflow-hidden flex hover:shadow-[0_8px_32px_rgba(6,27,14,0.10)] transition-all duration-300">
+                <div key={dog.id} className="bg-white border border-[#e4e2e1] rounded-2xl overflow-hidden flex hover:shadow-[0_8px_32px_rgba(6,27,14,0.10)] transition-all duration-300">
+                  <Link href={isDemo ? '#' : `/dog/${dog.id}`} className="flex flex-grow min-w-0">
                     <div className="w-24 h-24 flex-shrink-0 bg-[#f0eded] relative overflow-hidden">
                       {dog.photos[0]
                         ? <img src={dog.photos[0]} alt={dog.name} className="w-full h-full object-cover" />
@@ -148,9 +148,17 @@ export default function ProfilePage() {
                         {dog.verified ? 'VERIFICADO KCC' : 'EN REVISIÓN'}
                       </span>
                     </div>
-                    <span className="material-symbols-outlined text-[#c3c8c1] self-center pr-3">chevron_right</span>
-                  </div>
-                </Link>
+                  </Link>
+                  {!isDemo && (
+                    <Link
+                      href={`/dog/${dog.id}/edit`}
+                      className="flex items-center pr-4 pl-2 text-[#a0a5a0] hover:text-[#061b0e] transition-colors"
+                      title="Editar"
+                    >
+                      <span className="material-symbols-outlined text-[20px]">edit</span>
+                    </Link>
+                  )}
+                </div>
               ))}
 
               {!isDemo && (
@@ -173,7 +181,7 @@ export default function ProfilePage() {
           {tab === 'settings' && (
             <div className="flex flex-col gap-2.5">
               {[
-                { icon: 'person', label: 'Datos personales', action: () => router.push('/onboarding/user') },
+                { icon: 'person', label: 'Datos personales', action: () => router.push('/edit-profile') },
                 { icon: 'description', label: 'Documentos', action: () => router.push('/documents') },
                 { icon: 'notifications', label: 'Notificaciones', action: () => {} },
                 { icon: 'lock', label: 'Seguridad', action: () => {} },

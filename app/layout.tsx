@@ -24,10 +24,28 @@ const manrope = Manrope({
   variable: "--font-manrope",
 });
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://purematch-app.vercel.app'
+
 export const metadata: Metadata = {
   title: "PureMatch — Registro Digital de Linaje Canino",
   description:
     "La plataforma donde los perros con pedigree encuentran su mejor match. Solo perfiles verificados. Solo contactos de confianza.",
+  metadataBase: new URL(APP_URL),
+  openGraph: {
+    title: "PureMatch — Registro Digital de Linaje Canino",
+    description: "La plataforma donde los perros con pedigree encuentran su mejor match. Solo perfiles verificados.",
+    url: APP_URL,
+    siteName: "PureMatch",
+    locale: "es_CL",
+    type: "website",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "PureMatch" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PureMatch — Registro Digital de Linaje Canino",
+    description: "La plataforma donde los perros con pedigree encuentran su mejor match.",
+    images: ["/opengraph-image"],
+  },
 };
 
 export default function RootLayout({

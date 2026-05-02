@@ -327,6 +327,16 @@ export default function MatchesPage() {
                               <p className="text-xs text-[#737973]">{m.breed}{m.age ? ` · ${m.age}` : ''}</p>
                             </div>
                           </div>
+                          <div className="border-t border-[#e4e2e1] px-4 py-3">
+                            <button
+                              disabled={responding === m.matchId || isDemo}
+                              onClick={() => handleRespond(m, false)}
+                              className="flex items-center gap-1.5 text-[10px] font-bold tracking-[0.08em] text-[#737973] hover:text-[#ba1a1a] transition-colors disabled:opacity-40"
+                            >
+                              <span className="material-symbols-outlined text-sm">close</span>
+                              CANCELAR SOLICITUD
+                            </button>
+                          </div>
                         </div>
                       ))
                   }
