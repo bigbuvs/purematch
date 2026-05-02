@@ -104,7 +104,7 @@ export default function ExplorePage() {
               </button>
             )}
           </div>
-
+</div>
         <div className="px-4 pt-4">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-24 gap-3">
