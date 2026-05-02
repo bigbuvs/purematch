@@ -23,18 +23,17 @@ export default function DogProfilePage() {
   useEffect(() => {
     const load = async () => {
       const [{ data: dogData }, { data: docsData }] = await Promise.all([
-        insforge.from('dogs').select('*').eq('id', id).single(),
-        insforge.from('documents').select('*').eq('dog_id', id).eq('status', 'approved'),
+        insforge.database.from('dogs').select('*').eq('id', id).single(),
+        insforge.database.from('documents').select('*').eq('dog_id', id).eq('status', 'approved'),
       ])
       setDog(dogData)
       setDocs(docsData ?? [])
 
       if (user) {
-        const { data: myDogs } = await insforge.from('dogs').select('id').eq('owner_id', user.id)
+        const { data: myDogs } = await insforge.database.from('dogs').select('id').eq('owner_id', user.id)
         if (myDogs?.length) {
           const myDogIds = myDogs.map(d => d.id)
-          const { data: existing } = await insforge
-            .from('matches')
+          const { data: existing } = await insforge.database.from('matches')
             .select('id')
             .or(
               myDogIds.map(mid => `and(dog_a_id.eq.${mid},dog_b_id.eq.${id})`).join(',') +
@@ -54,9 +53,9 @@ export default function DogProfilePage() {
   const handleMatch = async () => {
     if (!user || !dog) return
     setMatchLoading(true)
-    const { data: myDogs } = await insforge.from('dogs').select('id').eq('owner_id', user.id).limit(1)
+    const { data: myDogs } = await insforge.database.from('dogs').select('id').eq('owner_id', user.id).limit(1)
     if (!myDogs?.[0]) { setMatchLoading(false); return }
-    await insforge.from('matches').insert({ dog_a_id: myDogs[0].id, dog_b_id: dog.id, status_a: 'accepted', status_b: 'pending', contact_unlocked: false })
+    await insforge.database.from('matches').insert({ dog_a_id: myDogs[0].id, dog_b_id: dog.id, status_a: 'accepted', status_b: 'pending', contact_unlocked: false })
     setMatchSent(true)
     setMatchLoading(false)
   }

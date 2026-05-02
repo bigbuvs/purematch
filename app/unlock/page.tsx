@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import TopBar from '@/components/TopBar'
 import { insforge } from '@/lib/insforge'
@@ -17,6 +17,10 @@ interface MatchWithDogs extends Match {
 type PayMethod = 'webpay' | 'mercadopago'
 
 export default function UnlockPage() {
+  return <Suspense><UnlockPageInner /></Suspense>
+}
+
+function UnlockPageInner() {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -37,8 +41,7 @@ export default function UnlockPage() {
     if (!matchId) { router.replace('/matches'); return }
 
     const load = async () => {
-      const { data: match, error: matchErr } = await insforge
-        .from('matches')
+      const { data: match, error: matchErr } = await insforge.database.from('matches')
         .select('*, dog_a:dogs!dog_a_id(*), dog_b:dogs!dog_b_id(*)')
         .eq('id', matchId)
         .single()
@@ -48,15 +51,14 @@ export default function UnlockPage() {
       const m = match as unknown as MatchWithDogs
       setMatchData(m)
 
-      const { data: myDogs } = await insforge.from('dogs').select('*').eq('owner_id', user.id)
+      const { data: myDogs } = await insforge.database.from('dogs').select('*').eq('owner_id', user.id)
       const mine = myDogs?.find(d => d.id === m.dog_a_id || d.id === m.dog_b_id) ?? null
       const other = mine?.id === m.dog_a_id ? m.dog_b : m.dog_a
       setMyDog(mine)
       setOtherDog(other)
 
       if (m.contact_unlocked) {
-        const { data: owner } = await insforge
-          .from('users')
+        const { data: owner } = await insforge.database.from('users')
           .select('name, phone, email')
           .eq('id', other.owner_id)
           .single()
@@ -77,8 +79,7 @@ export default function UnlockPage() {
     // Simulate payment processing — replace with Webpay/MercadoPago redirect in production
     await new Promise(r => setTimeout(r, 1800))
 
-    const { error: updateErr } = await insforge
-      .from('matches')
+    const { error: updateErr } = await insforge.database.from('matches')
       .update({ contact_unlocked: true, unlocked_at: new Date().toISOString() })
       .eq('id', matchData.id)
 
@@ -89,8 +90,7 @@ export default function UnlockPage() {
     }
 
     if (otherDog) {
-      const { data: owner } = await insforge
-        .from('users')
+      const { data: owner } = await insforge.database.from('users')
         .select('name, phone, email')
         .eq('id', otherDog.owner_id)
         .single()

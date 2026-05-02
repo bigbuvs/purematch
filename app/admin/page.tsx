@@ -60,16 +60,16 @@ export default function AdminPage() {
     setLoading(true)
 
     const [{ data: documents }, { data: dogsData }] = await Promise.all([
-      insforge.from('documents').select('*, dog:dogs(id, name, breed, owner_id, verified)').order('uploaded_at', { ascending: false }),
-      insforge.from('dogs').select('id, verified'),
+      insforge.database.from('documents').select('*, dog:dogs(id, name, breed, owner_id, verified)').order('uploaded_at', { ascending: false }),
+      insforge.database.from('dogs').select('id, verified') as unknown as Promise<{ data: { id: string; verified: boolean }[] | null }>,
     ])
 
     if (!documents) { setLoading(false); return }
 
     const ownerIds = [...new Set((documents as any[]).map((d: any) => d.dog?.owner_id).filter(Boolean))]
     const { data: owners } = ownerIds.length > 0
-      ? await insforge.from('users').select('id, name, email').in('id', ownerIds)
-      : { data: [] }
+      ? await insforge.database.from('users').select('id, name, email').in('id', ownerIds)
+      : { data: [] as { id: string; name: string; email: string }[] }
 
     const ownerMap = Object.fromEntries((owners ?? []).map(o => [o.id, o]))
 
@@ -100,24 +100,23 @@ export default function AdminPage() {
   const updateDocStatus = async (docId: string, status: ValidationStatus, dogId: string) => {
     setActionLoading(docId)
 
-    await insforge.from('documents').update({ status, reviewed_at: new Date().toISOString() }).eq('id', docId)
+    await (insforge.database.from('documents') as any).update({ status, reviewed_at: new Date().toISOString() }).eq('id', docId)
 
     // If approving, check if dog now has all required docs approved → mark verified
     if (status === 'approved') {
-      const { data: dogDocs } = await insforge
-        .from('documents')
+      const { data: dogDocs } = await insforge.database.from('documents')
         .select('type, status')
         .eq('dog_id', dogId)
 
       const required = ['pedigree', 'vaccines']
-      const allApproved = required.every(t => dogDocs?.some(d => d.type === t && d.status === 'approved'))
+      const allApproved = required.every((t: string) => dogDocs?.some((d: any) => d.type === t && d.status === 'approved'))
       if (allApproved) {
-        await insforge.from('dogs').update({ verified: true, score: 80 }).eq('id', dogId)
+        await insforge.database.from('dogs').update({ verified: true, score: 80 }).eq('id', dogId)
       }
     }
 
     if (status === 'rejected') {
-      await insforge.from('dogs').update({ verified: false }).eq('id', dogId)
+      await insforge.database.from('dogs').update({ verified: false }).eq('id', dogId)
     }
 
     setActionLoading(null)

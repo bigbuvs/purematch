@@ -1,11 +1,9 @@
-import { createClient } from '@supabase/supabase-js'
-import type { Database } from './database.types'
+import { createClient } from '@insforge/sdk'
 
-const url = process.env.NEXT_PUBLIC_INSFORGE_URL!
-const anonKey = process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!
+const baseUrl = process.env.NEXT_PUBLIC_INSFORGE_URL ?? ''
+const anonKey = process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY
 
-if (!url || !anonKey) {
-  throw new Error('Missing NEXT_PUBLIC_INSFORGE_URL or NEXT_PUBLIC_INSFORGE_ANON_KEY in .env.local')
-}
-
-export const insforge = createClient<Database>(url, anonKey)
+export const insforge = createClient({
+  baseUrl,
+  anonKey: anonKey || undefined,
+})

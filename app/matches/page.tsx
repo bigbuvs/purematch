@@ -75,7 +75,6 @@ const DEMO_PENDING: MatchCard[] = [
 
 export default function MatchesPage() {
   const { user } = useAuth()
-  const isDemo = user?.id === 'demo-user'
   const [tab, setTab] = useState<'mutual' | 'pending'>('mutual')
   const [mutual, setMutual] = useState<MatchCard[]>([])
   const [pending, setPending] = useState<MatchCard[]>([])
@@ -134,177 +133,138 @@ export default function MatchesPage() {
     load()
   }, [user, isDemo])
 
-  return (
-    <div className="bg-[#fcf9f8] min-h-screen flex flex-col">
-      <TopBar title="Matches" />
+  const EmptyState = ({ icon, title, desc }: { icon: string; title: string; desc: string }) => (
+    <div className="flex flex-col items-center text-center py-20 gap-4">
+      <div className="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center">
+        <span className="material-symbols-outlined text-3xl text-outline-variant">{icon}</span>
+      </div>
+      <div>
+        <p className="font-serif font-semibold text-primary mb-1">{title}</p>
+        <p className="text-on-surface-variant text-sm leading-relaxed max-w-[260px] mx-auto">{desc}</p>
+      </div>
+    </div>
+  )
 
+  return (
+    <div className="bg-background text-on-background min-h-screen flex flex-col">
+      <TopBar title="Matches" />
       <main className="flex-grow pb-[80px] max-w-[680px] mx-auto w-full">
 
-        {/* Sticky tabs */}
-        <div className="sticky top-[60px] z-30 bg-[#fcf9f8]/95 backdrop-blur-sm border-b border-[#c3c8c1]/60">
-          <div className="flex">
-            {([
-              { key: 'mutual',  label: 'Mutuos',      count: mutual.length  },
-              { key: 'pending', label: 'Pendientes',   count: pending.length },
-            ] as const).map(t => (
-              <button
-                key={t.key}
-                onClick={() => setTab(t.key)}
-                className={`flex-1 py-3.5 text-[11px] font-semibold tracking-[0.08em] flex items-center justify-center gap-2 transition-colors border-b-2 ${
-                  tab === t.key
-                    ? 'border-[#061b0e] text-[#061b0e]'
-                    : 'border-transparent text-[#737973] hover:text-[#1b1c1c]'
-                }`}
-              >
-                {t.label.toUpperCase()}
-                <span className={`text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold ${
-                  tab === t.key ? 'bg-[#061b0e] text-white' : 'bg-[#e4e2e1] text-[#737973]'
-                }`}>
-                  {t.count}
-                </span>
-              </button>
-            ))}
-          </div>
+        {/* Tabs */}
+        <div className="flex border-b border-outline-variant bg-surface sticky top-[60px] z-30">
+          {([
+            { key: 'mutual',  label: 'Mutuos',     count: mutual.length  },
+            { key: 'pending', label: 'Pendientes',  count: pending.length },
+          ] as const).map(t => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              className={`flex-1 py-3.5 font-label-caps text-[11px] tracking-[0.08em] flex items-center justify-center gap-2 transition-colors border-b-2 ${tab === t.key ? 'border-primary text-primary' : 'border-transparent text-outline hover:text-on-surface'}`}
+            >
+              {t.label.toUpperCase()}
+              <span className={`text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold ${tab === t.key ? 'bg-primary text-on-primary' : 'bg-surface-container text-outline'}`}>
+                {t.count}
+              </span>
+            </button>
+          ))}
         </div>
 
         <div className="px-4 pt-5">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-28 gap-3">
-              <span className="material-symbols-outlined text-5xl text-[#c3c8c1] animate-spin">progress_activity</span>
-              <p className="text-[10px] font-semibold tracking-[0.1em] text-[#737973]">CARGANDO MATCHES...</p>
+            <div className="flex flex-col items-center justify-center py-24 gap-3">
+              <span className="material-symbols-outlined text-5xl text-outline-variant animate-spin">progress_activity</span>
+              <p className="font-label-caps text-[10px] text-outline tracking-[0.1em]">CARGANDO MATCHES...</p>
             </div>
           ) : (
             <>
-              {/* ── MUTUAL TAB ── */}
               {tab === 'mutual' && (
-                <div className="flex flex-col gap-4">
-                  {mutual.length === 0 ? (
-                    <EmptyState
-                      icon="handshake"
-                      title="Sin matches mutuos aún"
-                      desc="Cuando ambas partes acepten, el match aparecerá aquí con datos de contacto."
-                    />
-                  ) : (
-                    mutual.map(m => (
-                      <div key={m.id} className="bg-white border border-[#e4e2e1] rounded-2xl overflow-hidden hover:shadow-[0_8px_32px_rgba(6,27,14,0.10)] transition-all duration-300">
-                        <div className="flex gap-0">
-                          {/* Square photo */}
-                          <div className="w-32 h-32 flex-shrink-0 relative overflow-hidden bg-[#f0eded]">
-                            {m.photo
-                              ? <img src={m.photo} alt={m.dogName} className="w-full h-full object-cover" />
-                              : <div className="w-full h-full flex items-center justify-center">
-                                  <span className="material-symbols-outlined text-4xl text-[#c3c8c1]" style={{ fontVariationSettings: "'FILL' 1" }}>pets</span>
+                <div className="flex flex-col gap-3">
+                  {mutual.length === 0
+                    ? <EmptyState icon="handshake" title="Sin matches mutuos aún" desc="Cuando ambas partes acepten, aparecerá aquí el contacto." />
+                    : mutual.map(m => (
+                        <div key={m.id} className="bg-surface border border-outline-variant rounded-2xl overflow-hidden">
+                          <div className="flex gap-0">
+                            {/* Photo */}
+                            <div className="w-28 h-28 flex-shrink-0 bg-surface-container relative overflow-hidden">
+                              {m.photo
+                                ? <img src={m.photo} alt={m.dogName} className="w-full h-full object-cover" />
+                                : <div className="w-full h-full flex items-center justify-center">
+                                    <span className="material-symbols-outlined text-4xl text-outline-variant" style={{ fontVariationSettings: "'FILL' 1" }}>pets</span>
+                                  </div>
+                              }
+                            </div>
+
+                            {/* Info */}
+                            <div className="flex flex-col justify-between flex-grow min-w-0 p-4">
+                              <div>
+                                <div className="flex items-center gap-1.5 mb-0.5">
+                                  <span className="material-symbols-outlined text-sm text-green-700" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+                                  <span className="font-label-caps text-[9px] text-green-700 tracking-[0.1em]">MATCH MUTUO</span>
                                 </div>
-                            }
-                            {/* Match badge overlay */}
-                            <div className="absolute top-2 left-2 bg-[#fed488] rounded-full w-6 h-6 flex items-center justify-center shadow-sm">
-                              <span className="material-symbols-outlined text-[#261900] text-[13px]" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+                                <h3 className="font-serif font-semibold text-primary text-base truncate">{m.dogName}</h3>
+                                <p className="font-metadata text-xs text-outline">{m.breed}{m.age ? ` · ${m.age}` : ''}</p>
+                                {m.zone && (
+                                  <div className="flex items-center gap-1 mt-1">
+                                    <span className="material-symbols-outlined text-outline text-xs">location_on</span>
+                                    <span className="font-metadata text-xs text-outline">{m.zone}</span>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
 
-                          {/* Info */}
-                          <div className="flex flex-col justify-between flex-grow min-w-0 p-4">
-                            <div>
-                              <span className="text-[9px] font-bold tracking-[0.12em] text-[#775a19] bg-[#fed488]/25 border border-[#fed488]/50 px-2 py-0.5 rounded-full">
-                                MATCH MUTUO
+                          {/* Contact action */}
+                          <div className="border-t border-outline-variant px-4 py-3">
+                            <Link
+                              href={`/unlock?match_id=${m.id}`}
+                              className={`flex items-center gap-2 font-label-caps text-[10px] tracking-[0.08em] transition-colors ${m.unlocked ? 'text-primary' : 'text-secondary hover:text-on-secondary-fixed-variant'}`}
+                            >
+                              <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
+                                {m.unlocked ? 'contact_phone' : 'lock_open'}
                               </span>
-                              <h3 className="font-serif font-bold text-[#061b0e] text-base mt-2 truncate">{m.dogName}</h3>
-                              <p className="text-[#737973] text-[12px]">{m.breed}{m.age ? ` · ${m.age}` : ''}</p>
-                              {m.zone && (
-                                <div className="flex items-center gap-1 mt-1.5">
-                                  <span className="material-symbols-outlined text-[#a0a5a0] text-[12px]">location_on</span>
-                                  <span className="text-[#a0a5a0] text-[11px] truncate">{m.zone.split(',')[0]}</span>
-                                </div>
-                              )}
-                            </div>
+                              {m.unlocked ? 'VER DATOS DE CONTACTO' : 'DESBLOQUEAR CONTACTO · $9.990'}
+                              {!m.unlocked && <span className="material-symbols-outlined text-xs ml-auto">arrow_forward</span>}
+                            </Link>
                           </div>
                         </div>
-
-                        {/* Contact CTA */}
-                        <div className="border-t border-[#e4e2e1] px-4 py-3">
-                          <Link
-                            href={isDemo ? '#' : `/unlock?match_id=${m.id}`}
-                            className={`flex items-center gap-2 text-[10px] font-bold tracking-[0.08em] transition-colors ${
-                              m.unlocked
-                                ? 'text-[#061b0e]'
-                                : 'text-[#775a19] hover:text-[#261900]'
-                            }`}
-                          >
-                            <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
-                              {m.unlocked ? 'contact_phone' : 'lock_open'}
-                            </span>
-                            {m.unlocked ? 'VER DATOS DE CONTACTO' : 'DESBLOQUEAR CONTACTO · $9.990'}
-                            {!m.unlocked && (
-                              <span className="ml-auto bg-[#fed488] text-[#261900] text-[9px] font-bold px-2.5 py-1 rounded-full">
-                                DESBLOQUEAR
-                              </span>
-                            )}
-                          </Link>
-                        </div>
-                      </div>
-                    ))
-                  )}
+                      ))
+                  }
                 </div>
               )}
 
-              {/* ── PENDING TAB ── */}
               {tab === 'pending' && (
                 <div className="flex flex-col gap-3">
-                  {pending.length === 0 ? (
-                    <EmptyState
-                      icon="schedule"
-                      title="Sin solicitudes pendientes"
-                      desc="Las solicitudes que envíes aparecerán aquí mientras esperan respuesta."
-                    />
-                  ) : (
-                    pending.map(m => (
-                      <div key={m.id} className="bg-white border border-[#e4e2e1] rounded-2xl overflow-hidden">
-                        <div className="flex gap-0">
-                          {/* Blurred photo */}
-                          <div className="w-28 h-28 flex-shrink-0 relative overflow-hidden bg-[#f0eded]">
-                            {m.photo
-                              ? <>
-                                  <img src={m.photo} alt={m.dogName} className="w-full h-full object-cover opacity-50 blur-[2px] scale-105" />
-                                </>
-                              : <div className="w-full h-full flex items-center justify-center">
-                                  <span className="material-symbols-outlined text-4xl text-[#c3c8c1]" style={{ fontVariationSettings: "'FILL' 1" }}>pets</span>
-                                </div>
-                            }
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <div className="w-8 h-8 rounded-full bg-[#fcf9f8]/90 flex items-center justify-center shadow-sm">
-                                <span className="material-symbols-outlined text-[#737973] text-[18px]">schedule</span>
+                  {pending.length === 0
+                    ? <EmptyState icon="schedule" title="Sin solicitudes pendientes" desc="Las solicitudes que envíes y aún no tienen respuesta aparecerán aquí." />
+                    : pending.map(m => (
+                        <div key={m.id} className="bg-surface border border-outline-variant rounded-2xl overflow-hidden">
+                          <div className="flex gap-0">
+                            <div className="w-28 h-28 flex-shrink-0 bg-surface-container relative overflow-hidden">
+                              {m.photo
+                                ? <>
+                                    <img src={m.photo} alt={m.dogName} className="w-full h-full object-cover opacity-60" />
+                                    <div className="absolute inset-0 bg-surface/40 backdrop-blur-[2px]" />
+                                  </>
+                                : <div className="w-full h-full flex items-center justify-center">
+                                    <span className="material-symbols-outlined text-4xl text-outline-variant" style={{ fontVariationSettings: "'FILL' 1" }}>pets</span>
+                                  </div>
+                              }
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <span className="material-symbols-outlined text-outline text-2xl">schedule</span>
                               </div>
                             </div>
-                          </div>
 
-                          {/* Info */}
-                          <div className="flex flex-col justify-center flex-grow min-w-0 p-4">
-                            <span className="text-[9px] font-bold tracking-[0.12em] text-[#737973] bg-[#f0eded] px-2 py-0.5 rounded-full w-fit mb-2">
-                              ESPERANDO RESPUESTA
-                            </span>
-                            <h3 className="font-serif font-bold text-[#1b1c1c] text-base truncate">{m.dogName}</h3>
-                            <p className="text-[#737973] text-[12px]">{m.breed}</p>
-                            {m.zone && (
-                              <div className="flex items-center gap-1 mt-1">
-                                <span className="material-symbols-outlined text-[#a0a5a0] text-[11px]">location_on</span>
-                                <span className="text-[#a0a5a0] text-[11px] truncate">{m.zone.split(',')[0]}</span>
+                            <div className="flex flex-col justify-center flex-grow min-w-0 p-4">
+                              <div className="flex items-center gap-1.5 mb-0.5">
+                                <span className="font-label-caps text-[9px] text-outline tracking-[0.1em]">ESPERANDO RESPUESTA</span>
                               </div>
-                            )}
+                              <h3 className="font-serif font-semibold text-primary text-base truncate">{m.dogName}</h3>
+                              <p className="font-metadata text-xs text-outline">{m.breed}</p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-
-              {/* Demo notice */}
-              {isDemo && (
-                <div className="mt-6 flex items-start gap-3 bg-[#fed488]/15 border border-[#fed488]/50 rounded-xl px-4 py-3">
-                  <span className="material-symbols-outlined text-[#775a19] text-[18px] mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>info</span>
-                  <p className="text-[11px] text-[#775a19] leading-relaxed">
-                    <span className="font-bold">Modo Demo —</span> Los datos son de muestra. Crea una cuenta para ver tus matches reales.
-                  </p>
+                      ))
+                  }
                 </div>
               )}
             </>

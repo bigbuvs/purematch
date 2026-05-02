@@ -21,12 +21,12 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!user) return
     const load = async () => {
-      const [{ data: dogsData }, { count }] = await Promise.all([
-        insforge.from('dogs').select('*').eq('owner_id', user.id),
-        insforge.from('matches').select('*', { count: 'exact', head: true })
-          .or(`dog_a_id.in.(${(dogsData ?? []).map((d: Dog) => d.id).join(',') || 'null'}),dog_b_id.in.(${(dogsData ?? []).map((d: Dog) => d.id).join(',') || 'null'})`)
-          .eq('status_a', 'accepted').eq('status_b', 'accepted'),
-      ])
+      const { data: dogsData } = await insforge.database.from('dogs').select('*').eq('owner_id', user.id)
+      const dogIds = (dogsData ?? []).map((d: Dog) => d.id)
+      const idList = dogIds.join(',') || 'null'
+      const { count } = await insforge.database.from('matches').select('*', { count: 'exact', head: true })
+        .or(`dog_a_id.in.(${idList}),dog_b_id.in.(${idList})`)
+        .eq('status_a', 'accepted').eq('status_b', 'accepted')
       setDogs(dogsData ?? [])
       setMatchCount(count ?? 0)
       setLoading(false)
@@ -39,8 +39,9 @@ export default function ProfilePage() {
     router.push('/auth')
   }
 
-  const name = user?.user_metadata?.name ?? user?.email ?? 'Usuario'
-  const memberSince = user?.created_at ? new Date(user.created_at).toLocaleDateString('es-CL', { month: 'long', year: 'numeric' }) : ''
+  const name = user?.profile?.name ?? user?.user_metadata?.name ?? user?.email ?? 'Usuario'
+  const created = user?.createdAt ?? user?.created_at
+  const memberSince = created ? new Date(created).toLocaleDateString('es-CL', { month: 'long', year: 'numeric' }) : ''
 
   return (
     <div className="bg-surface text-on-surface min-h-screen flex flex-col">
@@ -49,8 +50,8 @@ export default function ProfilePage() {
         <div className="bg-surface-container-low border-b border-outline-variant px-4 pt-6 pb-4 flex flex-col items-center gap-4">
           <div className="relative">
             <div className="w-24 h-24 rounded-full overflow-hidden border-[3px] border-[#fed488] bg-surface-container flex items-center justify-center">
-              {user?.user_metadata?.avatar_url
-                ? <img src={user.user_metadata.avatar_url} alt={name} className="w-full h-full object-cover" />
+              {(user?.profile?.avatar_url ?? user?.user_metadata?.avatar_url)
+                ? <img src={user?.profile?.avatar_url ?? user?.user_metadata?.avatar_url} alt={name} className="w-full h-full object-cover" />
                 : <span className="material-symbols-outlined text-4xl text-outline">person</span>
               }
             </div>

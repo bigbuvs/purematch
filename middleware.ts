@@ -5,8 +5,7 @@ const PROTECTED = ['/explore', '/matches', '/profile', '/dog', '/onboarding', '/
 const AUTH_ROUTES = ['/auth']
 
 function hasAuthCookie(request: NextRequest): boolean {
-  // InsForge SDK sets insforge_csrf_token cookie when user is authenticated
-  return request.cookies.has('insforge_csrf_token')
+  return request.cookies.has('insforge_csrf_token') || request.cookies.has('purematch_demo')
 }
 
 export function middleware(request: NextRequest) {

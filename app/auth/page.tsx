@@ -2,9 +2,11 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { insforge } from '@/lib/insforge'
+import { useAuth } from '@/context/AuthContext'
 
 export default function AuthPage() {
   const router = useRouter()
+  const { refresh } = useAuth()
   const [tab, setTab] = useState<'login' | 'register'>('login')
   const [showPass, setShowPass] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -16,6 +18,7 @@ export default function AuthPage() {
     setLoading(true); setError('')
     const { error } = await insforge.auth.signInWithPassword({ email: form.email, password: form.password })
     if (error) { setError(error.message); setLoading(false); return }
+    await refresh()
     router.push('/explore')
   }
 
@@ -25,16 +28,17 @@ export default function AuthPage() {
     const { error } = await insforge.auth.signUp({
       email: form.email,
       password: form.password,
-      options: { data: { name: form.name } },
+      name: form.name,
     })
     if (error) { setError(error.message); setLoading(false); return }
+    await refresh()
     router.push('/onboarding/user')
   }
 
   const handleGoogle = () =>
     insforge.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/explore` },
+      redirectTo: `${window.location.origin}/explore`,
     })
 
   return (
