@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
+import NavDrawer from '@/components/NavDrawer'
 
 const HERO_IMG = 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1920&q=80'
 
@@ -19,108 +20,6 @@ const breeds = [
   { name: 'German Shepherd', img: 'https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?auto=format&fit=crop&w=400&h=300&q=80' },
 ]
 
-const NAV_LINKS = [
-  { label: 'Quiénes somos',  href: '#quienes-somos', icon: 'groups' },
-  { label: 'Qué hacemos',    href: '#como-funciona',  icon: 'auto_awesome' },
-  { label: 'Ver ejemplares', href: '/explore',         icon: 'search' },
-  { label: 'Términos de uso',href: '/terms',           icon: 'gavel' },
-  { label: 'Privacidad',     href: '/privacy',         icon: 'shield' },
-]
-
-function NavDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
-  // Prevent body scroll when open
-  useEffect(() => {
-    if (open) document.body.style.overflow = 'hidden'
-    else document.body.style.overflow = ''
-    return () => { document.body.style.overflow = '' }
-  }, [open])
-
-  const handleLink = (href: string) => {
-    onClose()
-    if (href.startsWith('#')) {
-      setTimeout(() => {
-        document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
-      }, 300)
-    }
-  }
-
-  return (
-    <>
-      {/* Backdrop */}
-      <div
-        onClick={onClose}
-        className={`fixed inset-0 z-[60] bg-[#061b0e]/60 backdrop-blur-sm transition-opacity duration-300 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-      />
-
-      {/* Drawer panel */}
-      <aside
-        className={`fixed top-0 left-0 z-[70] h-full w-[300px] sm:w-[340px] bg-[#061b0e] flex flex-col shadow-[4px_0_40px_rgba(0,0,0,0.4)] transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${open ? 'translate-x-0' : '-translate-x-full'}`}
-      >
-        {/* Drawer header */}
-        <div className="flex items-center justify-between px-6 pt-6 pb-5 border-b border-white/10">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[#fed488] flex items-center justify-center flex-shrink-0">
-              <span className="material-symbols-outlined text-[#261900] text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>pets</span>
-            </div>
-            <span className="font-serif font-black text-[16px] text-white tracking-[0.15em]">PureMatch</span>
-          </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
-          >
-            <span className="material-symbols-outlined text-white text-[18px]">close</span>
-          </button>
-        </div>
-
-        {/* Nav links */}
-        <nav className="flex flex-col gap-1 px-3 pt-4 flex-grow">
-          {NAV_LINKS.map(({ label, href, icon }) =>
-            href.startsWith('/') ? (
-              <Link
-                key={label}
-                href={href}
-                onClick={onClose}
-                className="flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-colors group"
-              >
-                <span className="material-symbols-outlined text-[#fed488]/70 group-hover:text-[#fed488] text-[20px] transition-colors">{icon}</span>
-                <span className="text-[14px] font-medium">{label}</span>
-              </Link>
-            ) : (
-              <button
-                key={label}
-                onClick={() => handleLink(href)}
-                className="flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-colors group w-full text-left"
-              >
-                <span className="material-symbols-outlined text-[#fed488]/70 group-hover:text-[#fed488] text-[20px] transition-colors">{icon}</span>
-                <span className="text-[14px] font-medium">{label}</span>
-              </button>
-            )
-          )}
-
-          {/* Divider */}
-          <div className="h-px bg-white/10 my-2 mx-1" />
-
-          <Link
-            href="/auth"
-            onClick={onClose}
-            className="flex items-center gap-3.5 px-4 py-3.5 rounded-xl bg-[#fed488] text-[#261900] hover:bg-[#ffdea5] transition-colors font-bold"
-          >
-            <span className="material-symbols-outlined text-[20px]">login</span>
-            <span className="text-[14px] font-bold tracking-[0.05em]">Ingresar / Registrarse</span>
-          </Link>
-        </nav>
-
-        {/* Footer */}
-        <div className="px-6 py-5 border-t border-white/10">
-          <p className="text-[10px] text-white/30 tracking-[0.1em] leading-relaxed">
-            PLATAFORMA PRIVADA · DATOS PROTEGIDOS<br />
-            © {new Date().getFullYear()} PUREMATCH · CHILE
-          </p>
-        </div>
-      </aside>
-    </>
-  )
-}
 
 export default function LandingPage() {
   const { user, loading } = useAuth()

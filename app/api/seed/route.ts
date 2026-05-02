@@ -8,31 +8,14 @@ const db = createClient({
   anonKey: process.env.INSFORGE_SERVICE_ROLE_KEY,
 })
 
-const DOGS = [
-  {
-    name: 'Arya von Westwood',
-    breed: 'Border Collie',
-    age: '2 años',
-    sex: 'Hembra' as const,
-    zone: 'Providencia, RM',
-    pedigree_number: 'KCC-2024-BC-00892',
-    photos: ['https://images.unsplash.com/photo-1589209534004-0c3ec3d8a9e5?w=800&h=1000&fit=crop'],
-  },
-  {
-    name: 'Thor of Golden Peak',
-    breed: 'Golden Retriever',
-    age: '3 años',
-    sex: 'Macho' as const,
-    zone: 'Las Condes, RM',
-    pedigree_number: 'KCC-2023-GR-01147',
-    photos: ['https://images.unsplash.com/photo-1552053831-71594a27632d?w=800&h=1000&fit=crop'],
-  },
+// ── Background dogs with anonymous fake owners ────────────────────────────────
+const BACKGROUND_DOGS = [
   {
     name: 'Luna von Schwarzwald',
     breed: 'German Shepherd',
     age: '4 años',
     sex: 'Hembra' as const,
-    zone: 'Vitacura, RM',
+    zone: 'Vitacura',
     pedigree_number: 'KCC-2022-GS-00634',
     photos: ['https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?w=800&h=1000&fit=crop'],
   },
@@ -41,7 +24,7 @@ const DOGS = [
     breed: 'Husky Siberiano',
     age: '2 años',
     sex: 'Macho' as const,
-    zone: 'Ñuñoa, RM',
+    zone: 'Ñuñoa',
     pedigree_number: 'KCC-2024-HS-00311',
     photos: ['https://images.unsplash.com/photo-1605568427561-40dd23c2acea?w=800&h=1000&fit=crop'],
   },
@@ -50,7 +33,7 @@ const DOGS = [
     breed: 'Poodle',
     age: '1 año',
     sex: 'Hembra' as const,
-    zone: 'Santiago Centro',
+    zone: 'Las Condes',
     pedigree_number: null,
     photos: ['https://images.unsplash.com/photo-1594226801341-41427b4e5c22?w=800&h=1000&fit=crop'],
   },
@@ -59,7 +42,7 @@ const DOGS = [
     breed: 'German Shepherd',
     age: '5 años',
     sex: 'Macho' as const,
-    zone: 'Maipú, RM',
+    zone: 'Providencia',
     pedigree_number: 'KCC-2020-GS-00192',
     photos: ['https://images.unsplash.com/photo-1568572933382-74d440642117?w=800&h=1000&fit=crop'],
   },
@@ -68,20 +51,102 @@ const DOGS = [
     breed: 'Labrador Retriever',
     age: '3 años',
     sex: 'Hembra' as const,
-    zone: 'La Florida, RM',
+    zone: 'La Reina',
     pedigree_number: 'KCC-2022-LR-00451',
     photos: ['https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=800&h=1000&fit=crop'],
   },
 ]
 
-const MY_DOG = {
-  name: 'Rex de Santiago',
-  breed: 'Beagle',
-  age: '2 años',
-  sex: 'Macho' as const,
-  zone: 'Providencia, RM',
-  pedigree_number: 'KCC-2024-BG-00123',
-  photos: ['https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&h=1000&fit=crop'],
+// ── Real test accounts ────────────────────────────────────────────────────────
+const TEST_ACCOUNTS = [
+  {
+    email: 'demo1@purematch.cl',
+    password: 'PureMatch2026!',
+    profile: { name: 'Alejandro von West', phone: '+56 9 9001 0001', zone: 'Las Condes' },
+    dog: {
+      name: 'Arya von Westwood',
+      breed: 'Border Collie',
+      age: '2 años',
+      sex: 'Hembra' as const,
+      zone: 'Las Condes',
+      pedigree_number: 'KCC-2024-BC-00892',
+      photos: ['https://images.unsplash.com/photo-1589209534004-0c3ec3d8a9e5?w=800&h=1000&fit=crop'],
+    },
+  },
+  {
+    email: 'demo2@purematch.cl',
+    password: 'PureMatch2026!',
+    profile: { name: 'Valentina Torres', phone: '+56 9 9002 0002', zone: 'Providencia' },
+    dog: {
+      name: 'Thor of Golden Peak',
+      breed: 'Golden Retriever',
+      age: '3 años',
+      sex: 'Macho' as const,
+      zone: 'Providencia',
+      pedigree_number: 'KCC-2023-GR-01147',
+      photos: ['https://images.unsplash.com/photo-1552053831-71594a27632d?w=800&h=1000&fit=crop'],
+    },
+  },
+]
+
+async function upsertTestAccount(account: typeof TEST_ACCOUNTS[0], log: string[]) {
+  let userId: string | null = null
+
+  const { data: signUpData, error: signUpErr } = await db.auth.signUp({
+    email: account.email,
+    password: account.password,
+  })
+
+  if (signUpData?.user?.id) {
+    userId = signUpData.user.id
+    log.push(`Created auth account: ${account.email} (${userId})`)
+  } else if (signUpErr) {
+    // Already exists — sign in to get the id
+    const { data: signInData, error: signInErr } = await db.auth.signInWithPassword({
+      email: account.email,
+      password: account.password,
+    })
+    if (signInData?.user?.id) {
+      userId = signInData.user.id
+      log.push(`Auth account already exists: ${account.email} (${userId})`)
+    } else {
+      log.push(`ERROR ${account.email}: ${signInErr?.message ?? signUpErr?.message}`)
+      return null
+    }
+  }
+
+  if (!userId) return null
+
+  await db.database.from('users').upsert({
+    id: userId,
+    name: account.profile.name,
+    email: account.email,
+    phone: account.profile.phone,
+    zone: account.profile.zone,
+    rut: null,
+    avatar_url: null,
+  })
+  log.push(`Upserted profile: ${account.profile.name}`)
+
+  // Remove existing dogs to avoid duplicates
+  const { data: existingDogs } = await db.database.from('dogs').select('id').eq('owner_id', userId)
+  if (existingDogs?.length) {
+    await db.database.from('dogs').delete().eq('owner_id', userId)
+    log.push(`Deleted ${existingDogs.length} old dog(s) for ${account.email}`)
+  }
+
+  const { data: dogRow } = await db.database.from('dogs').insert({
+    owner_id: userId,
+    ...account.dog,
+  }).select('id').single()
+
+  if (dogRow) {
+    await db.database.from('dogs').update({ verified: true, score: 95 }).eq('id', dogRow.id)
+    log.push(`Created dog "${account.dog.name}": ${dogRow.id}`)
+    return { userId, dogId: dogRow.id as string }
+  }
+
+  return null
 }
 
 export async function GET(request: Request) {
@@ -92,60 +157,38 @@ export async function GET(request: Request) {
 
   const log: string[] = []
 
-  // Find a@a.com user in users table
-  const { data: userRows } = await db.database.from('users').select('id').eq('email', 'a@a.com').limit(1)
-  let myUserId: string | null = userRows?.[0]?.id ?? null
-  log.push(`a@a.com user in users table: ${myUserId ?? 'not found'}`)
+  // ── Real test accounts ────────────────────────────────────────────────────
+  const accountResults: Array<{ userId: string; dogId: string } | null> = []
+  for (const account of TEST_ACCOUNTS) {
+    accountResults.push(await upsertTestAccount(account, log))
+  }
+  const [acc1, acc2] = accountResults
 
-  // If not in users table, try to find via auth (InsForge may expose this)
-  // We'll create a placeholder if needed
-  if (!myUserId) {
-    // Insert a placeholder user row — auth ID will be linked when they log in
-    const placeholder = crypto.randomUUID()
-    await db.database.from('users').upsert({
-      id: placeholder,
-      name: 'Admin Demo',
-      email: 'a@a.com',
-      phone: '+56 9 0000 0001',
-      zone: 'Región Metropolitana',
-      rut: null,
-      avatar_url: null,
-    })
-    myUserId = placeholder
-    log.push(`Created placeholder user for a@a.com: ${placeholder}`)
+  // ── Mutual match between demo1 and demo2 ─────────────────────────────────
+  if (acc1 && acc2) {
+    const { data: existing } = await db.database.from('matches').select('id')
+      .or(`and(dog_a_id.eq.${acc1.dogId},dog_b_id.eq.${acc2.dogId}),and(dog_a_id.eq.${acc2.dogId},dog_b_id.eq.${acc1.dogId})`)
+      .limit(1)
+    if (!existing?.length) {
+      await db.database.from('matches').insert({
+        dog_a_id: acc1.dogId,
+        dog_b_id: acc2.dogId,
+        status_a: 'accepted',
+        status_b: 'accepted',
+        contact_unlocked: false,
+      })
+      log.push(`Mutual match: Arya <-> Thor`)
+    } else {
+      log.push(`Mutual match already exists`)
+    }
   }
 
-  // Clear existing demo dogs for a@a.com to avoid duplicates
-  const { data: existingMyDogs } = await db.database.from('dogs').select('id').eq('owner_id', myUserId)
-  if (existingMyDogs?.length) {
-    await db.database.from('dogs').delete().eq('owner_id', myUserId)
-    log.push(`Deleted ${existingMyDogs.length} existing dog(s) for a@a.com`)
-  }
+  // ── Background dogs with fake owner UUIDs ────────────────────────────────
+  const bgDogIds: string[] = []
+  for (let i = 0; i < BACKGROUND_DOGS.length; i++) {
+    const dog = BACKGROUND_DOGS[i]
+    const ownerId = crypto.randomUUID()
 
-  // Create demo dog for a@a.com
-  const { data: myDogRow, error: myDogErr } = await db.database.from('dogs').insert({
-    owner_id: myUserId,
-    ...MY_DOG,
-  }).select('id').single()
-
-  if (myDogErr || !myDogRow) {
-    log.push(`Error creating my dog: ${myDogErr?.message}`)
-    return NextResponse.json({ log, error: myDogErr?.message }, { status: 500 })
-  }
-  log.push(`Created dog for a@a.com: ${myDogRow.id}`)
-
-  // Mark my dog as verified
-  await db.database.from('dogs').update({ verified: true, score: 90 }).eq('id', myDogRow.id)
-
-  // Create other dogs with unique fake owner IDs
-  const createdDogIds: string[] = []
-  const fakeOwnerIds = DOGS.map(() => crypto.randomUUID())
-
-  for (let i = 0; i < DOGS.length; i++) {
-    const dog = DOGS[i]
-    const ownerId = fakeOwnerIds[i]
-
-    // Create fake user entry
     await db.database.from('users').upsert({
       id: ownerId,
       name: `Criador ${i + 1}`,
@@ -162,41 +205,39 @@ export async function GET(request: Request) {
     }).select('id').single()
 
     if (inserted) {
-      await db.database.from('dogs').update({ verified: true, score: 90 + i }).eq('id', inserted.id)
-      createdDogIds.push(inserted.id)
-      log.push(`Created dog: ${dog.name} (${inserted.id})`)
+      await db.database.from('dogs').update({ verified: true, score: 88 + i }).eq('id', inserted.id)
+      bgDogIds.push(inserted.id as string)
+      log.push(`Background dog: ${dog.name} (${inserted.id})`)
     }
   }
 
-  // Create 2 mutual matches between a@a.com's dog and first 2 other dogs
-  const matchTargets = createdDogIds.slice(0, 2)
-  for (const otherId of matchTargets) {
-    const { data: existing } = await db.database.from('matches').select('id')
-      .or(`and(dog_a_id.eq.${myDogRow.id},dog_b_id.eq.${otherId}),and(dog_a_id.eq.${otherId},dog_b_id.eq.${myDogRow.id})`)
-      .limit(1)
-    if (!existing?.length) {
-      await db.database.from('matches').insert({
-        dog_a_id: myDogRow.id,
-        dog_b_id: otherId,
-        status_a: 'accepted',
-        status_b: 'accepted',
-        contact_unlocked: false,
-      })
-      log.push(`Created mutual match: ${myDogRow.id} <-> ${otherId}`)
-    }
-  }
-
-  // 1 pending match (a@a.com sent, other pending)
-  if (createdDogIds[2]) {
+  // Incoming pending request for demo1 (Luna sent interest in Arya)
+  if (acc1 && bgDogIds[0]) {
     await db.database.from('matches').insert({
-      dog_a_id: myDogRow.id,
-      dog_b_id: createdDogIds[2],
+      dog_a_id: bgDogIds[0],
+      dog_b_id: acc1.dogId,
       status_a: 'accepted',
       status_b: 'pending',
       contact_unlocked: false,
     })
-    log.push(`Created pending match: ${myDogRow.id} -> ${createdDogIds[2]}`)
+    log.push(`Incoming request for Arya from Luna`)
   }
 
-  return NextResponse.json({ ok: true, log })
+  // Sent-pending request from demo2 to Balto
+  if (acc2 && bgDogIds[1]) {
+    await db.database.from('matches').insert({
+      dog_a_id: acc2.dogId,
+      dog_b_id: bgDogIds[1],
+      status_a: 'accepted',
+      status_b: 'pending',
+      contact_unlocked: false,
+    })
+    log.push(`Sent request from Thor to Balto`)
+  }
+
+  return NextResponse.json({
+    ok: true,
+    credentials: TEST_ACCOUNTS.map(a => ({ email: a.email, password: a.password })),
+    log,
+  })
 }
