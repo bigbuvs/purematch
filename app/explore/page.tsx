@@ -19,6 +19,7 @@ const DEMO_DOGS: Dog[] = [
 ]
 
 const ALL_BREEDS = ['Todos', 'Border Collie', 'Golden Retriever', 'Labrador Retriever', 'Poodle', 'Husky Siberiano', 'German Shepherd', 'Beagle', 'Bulldog Inglés', 'Dachshund', 'Chihuahua']
+const ALL_ZONES = ['Todos', 'Las Condes', 'Providencia', 'Vitacura', 'La Reina', 'Ñuñoa', 'Peñalolén', 'Macul']
 
 export default function ExplorePage() {
   const { user } = useAuth()
@@ -29,6 +30,7 @@ export default function ExplorePage() {
   const [search, setSearch] = useState('')
   const [activeBreed, setActiveBreed] = useState('Todos')
   const [sexFilter, setSexFilter] = useState<'Todos' | 'Macho' | 'Hembra'>('Todos')
+  const [zoneFilter, setZoneFilter] = useState('Todos')
 
   useEffect(() => {
     if (isDemo) { setDogs(DEMO_DOGS); setLoading(false); return }
@@ -40,12 +42,13 @@ export default function ExplorePage() {
   const filtered = dogs.filter(d => {
     const matchBreed = activeBreed === 'Todos' || d.breed === activeBreed
     const matchSex   = sexFilter === 'Todos'   || d.sex === sexFilter
+    const matchZone  = zoneFilter === 'Todos'  || (d.zone ?? '').toLowerCase().includes(zoneFilter.toLowerCase())
     const q = search.toLowerCase()
-    return matchBreed && matchSex && (!q || d.name.toLowerCase().includes(q) || d.breed.toLowerCase().includes(q) || (d.zone ?? '').toLowerCase().includes(q))
+    return matchBreed && matchSex && matchZone && (!q || d.name.toLowerCase().includes(q) || d.breed.toLowerCase().includes(q) || (d.zone ?? '').toLowerCase().includes(q))
   })
 
-  const clearFilters = () => { setSearch(''); setActiveBreed('Todos'); setSexFilter('Todos') }
-  const hasFilters = search || activeBreed !== 'Todos' || sexFilter !== 'Todos'
+  const clearFilters = () => { setSearch(''); setActiveBreed('Todos'); setSexFilter('Todos'); setZoneFilter('Todos') }
+  const hasFilters = search || activeBreed !== 'Todos' || sexFilter !== 'Todos' || zoneFilter !== 'Todos'
 
   return (
     <div className="bg-[#fcf9f8] min-h-screen flex flex-col">
@@ -92,6 +95,17 @@ export default function ExplorePage() {
               <button key={b} onClick={() => setActiveBreed(b)}
                 className={`flex-shrink-0 px-3 py-1 rounded-full text-[10px] font-semibold tracking-[0.06em] border transition-all ${activeBreed === b ? 'bg-[#fed488] text-[#261900] border-[#fed488]' : 'bg-white text-[#737973] border-[#c3c8c1] hover:border-[#061b0e]'}`}>
                 {b === 'Todos' ? 'TODOS' : b.toUpperCase()}
+              </button>
+            ))}
+          </div>
+
+          {/* Zone chips */}
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-0.5">
+            <span className="flex-shrink-0 text-[9px] font-bold tracking-[0.1em] text-[#a0a5a0] self-center">SECTOR</span>
+            {ALL_ZONES.map(z => (
+              <button key={z} onClick={() => setZoneFilter(z)}
+                className={`flex-shrink-0 px-3 py-1 rounded-full text-[10px] font-semibold tracking-[0.06em] border transition-all ${zoneFilter === z ? 'bg-[#061b0e] text-white border-[#061b0e]' : 'bg-white text-[#737973] border-[#c3c8c1] hover:border-[#061b0e]'}`}>
+                {z === 'Todos' ? 'TODOS' : z.toUpperCase()}
               </button>
             ))}
           </div>

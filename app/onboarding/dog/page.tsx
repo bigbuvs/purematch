@@ -7,17 +7,18 @@ import { insforge } from '@/lib/insforge'
 import { useAuth } from '@/context/AuthContext'
 
 const breeds = ['Border Collie','Golden Retriever','Labrador Retriever','Bulldog Inglés','Poodle','Husky Siberiano','German Shepherd','Beagle','Boxer','Dachshund','Chihuahua','Rottweiler','Yorkshire Terrier','Doberman']
+const zones = ['Las Condes','Providencia','Vitacura','La Reina','Ñuñoa','Peñalolén','Macul','Otro sector']
 
 export default function OnboardingDogPage() {
   const router = useRouter()
   const { user } = useAuth()
-  const [form, setForm] = useState({ name: '', breed: '', age: '', sex: '' as 'Macho' | 'Hembra' | '', pedigree: '' })
+  const [form, setForm] = useState({ name: '', breed: '', age: '', sex: '' as 'Macho' | 'Hembra' | '', pedigree: '', zone: '' })
   const [photos, setPhotos] = useState<File[]>([])
   const [previews, setPreviews] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
-  const allFilled = form.name && form.breed && form.age && form.sex
+  const allFilled = form.name && form.breed && form.age && form.sex && form.zone
 
   const handlePhoto = (file: File) => {
     if (photos.length >= 6) return
@@ -51,7 +52,7 @@ export default function OnboardingDogPage() {
       age: form.age,
       sex: form.sex as 'Macho' | 'Hembra',
       pedigree_number: form.pedigree || null,
-      zone: null,
+      zone: form.zone || null,
       photos: photoUrls,
     }).select('id').single()
 
@@ -176,6 +177,21 @@ export default function OnboardingDogPage() {
                     {s.toUpperCase()}
                   </button>
                 ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col">
+              <label className="text-[10px] font-bold tracking-[0.1em] text-[#737973] mb-1.5 ml-1">SECTOR *</label>
+              <div className="relative">
+                <select
+                  className="w-full bg-[#fcf9f8] border border-[#c3c8c1] rounded-xl px-4 py-3 text-[14px] text-[#1b1c1c] focus:outline-none focus:border-[#061b0e] transition-colors appearance-none cursor-pointer"
+                  value={form.zone}
+                  onChange={e => setForm(p => ({ ...p, zone: e.target.value }))}
+                >
+                  <option value="">Selecciona el sector</option>
+                  {zones.map(z => <option key={z} value={z}>{z}</option>)}
+                </select>
+                <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-[#737973] pointer-events-none text-[18px]">expand_more</span>
               </div>
             </div>
 

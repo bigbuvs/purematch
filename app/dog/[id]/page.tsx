@@ -56,7 +56,15 @@ export default function DogProfilePage() {
     setMatchLoading(true)
     const { data: myDogs } = await insforge.database.from('dogs').select('id').eq('owner_id', user.id).limit(1)
     if (!myDogs?.[0]) { setMatchLoading(false); return }
-    await insforge.database.from('matches').insert({ dog_a_id: myDogs[0].id, dog_b_id: dog.id, status_a: 'accepted', status_b: 'pending', contact_unlocked: false })
+    const { data: newMatch } = await insforge.database.from('matches').insert({ dog_a_id: myDogs[0].id, dog_b_id: dog.id, status_a: 'accepted', status_b: 'pending', contact_unlocked: false }).select('id').single()
+    // Fire notification (non-blocking)
+    if (newMatch) {
+      fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ matchId: newMatch.id, senderDogId: myDogs[0].id, receiverDogId: dog.id }),
+      }).catch(() => {})
+    }
     setMatchSent(true)
     setMatchLoading(false)
   }

@@ -178,6 +178,7 @@ export default function ProfilePage() {
                 { icon: 'notifications', label: 'Notificaciones', action: () => {} },
                 { icon: 'lock', label: 'Seguridad', action: () => {} },
                 { icon: 'help', label: 'Ayuda y soporte', action: () => {} },
+                ...(user?.email === 'a@a.com' ? [{ icon: 'admin_panel_settings', label: 'Panel de administración', action: () => router.push('/admin') }] : []),
               ].map(item => (
                 <button
                   key={item.label}

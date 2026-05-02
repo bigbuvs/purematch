@@ -14,28 +14,28 @@ export default function TopBar({ showBack = false, title = 'PureMatch' }: { show
   const avatar: string | undefined = user?.profile?.avatar_url ?? user?.user_metadata?.avatar_url
 
   return (
-    <header className="bg-surface border-b border-outline-variant flex items-center justify-between px-5 h-[60px] w-full sticky top-0 z-50">
+    <header className="bg-[#fcf9f8] border-b border-[#e4e2e1] flex items-center justify-between px-5 h-[60px] w-full sticky top-0 z-50">
       <div className="w-10">
         {showBack ? (
-          <button onClick={() => history.back()} className="material-symbols-outlined text-on-surface p-1 rounded-full hover:bg-surface-container transition-colors">
+          <button onClick={() => history.back()} className="material-symbols-outlined text-[#1b1c1c] p-1 rounded-full hover:bg-[#f0eded] transition-colors">
             arrow_back
           </button>
         ) : (
-          <div className="w-7 h-7 rounded-full border border-outline-variant flex items-center justify-center bg-surface-container">
-            <span className="material-symbols-outlined text-sm text-outline" style={{ fontVariationSettings: "'FILL' 1" }}>pets</span>
+          <div className="w-7 h-7 rounded-full border border-[#e4e2e1] flex items-center justify-center bg-[#f0eded]">
+            <span className="material-symbols-outlined text-sm text-[#737973]" style={{ fontVariationSettings: "'FILL' 1" }}>pets</span>
           </div>
         )}
       </div>
 
-      <h1 className="font-serif font-black text-lg text-primary tracking-widest uppercase">
+      <h1 className="font-serif font-black text-lg text-[#061b0e] tracking-widest uppercase">
         {title === 'PureMatch' ? 'PureMatch' : title}
       </h1>
 
       <Link href="/profile" className="w-10 flex justify-end">
-        <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-secondary-container bg-surface-container flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-[#c3c8c1] bg-[#f0eded] flex items-center justify-center">
           {avatar
             ? <img src={avatar} alt={name} className="w-full h-full object-cover" />
-            : <span className="font-serif font-bold text-xs text-primary">{initials}</span>
+            : <span className="font-serif font-bold text-xs text-[#061b0e]">{initials}</span>
           }
         </div>
       </Link>
