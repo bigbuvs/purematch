@@ -35,9 +35,9 @@ export default function TopBar({ showBack = false, title = 'PureMatch' }: { show
           )}
         </div>
 
-        <h1 className="font-serif font-black text-lg text-[#061b0e] tracking-widest uppercase">
+        <Link href="/" className="font-serif font-black text-lg text-[#061b0e] tracking-widest uppercase hover:text-[#1b3022] transition-colors">
           {title === 'PureMatch' ? 'PureMatch' : title}
-        </h1>
+        </Link>
 
         <Link href="/profile" className="w-10 flex justify-end">
           <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-[#c3c8c1] bg-[#f0eded] flex items-center justify-center">

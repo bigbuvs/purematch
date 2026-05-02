@@ -6,6 +6,7 @@ import { insforge } from '@/lib/insforge'
 import { useRouter } from 'next/navigation'
 
 const APP_LINKS = [
+  { label: 'Inicio',              href: '/',             icon: 'home' },
   { label: 'Explorar ejemplares', href: '/explore',      icon: 'search' },
   { label: 'Mis matches',         href: '/matches',      icon: 'favorite' },
   { label: 'Mi perfil',           href: '/profile',      icon: 'person' },
@@ -18,7 +19,8 @@ const INFO_LINKS = [
 ]
 
 const LANDING_LINKS = [
-  { label: 'Quiénes somos',  href: '#quienes-somos', icon: 'groups' },
+  { label: 'Inicio',         href: '/',               icon: 'home' },
+  { label: 'Quiénes somos',  href: '#quienes-somos',  icon: 'groups' },
   { label: 'Qué hacemos',    href: '#como-funciona',  icon: 'auto_awesome' },
   { label: 'Ver ejemplares', href: '/explore',        icon: 'search' },
 ]
