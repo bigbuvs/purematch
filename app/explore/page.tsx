@@ -33,7 +33,6 @@ export default function ExplorePage() {
 
   useEffect(() => {
     if (isDemo) { setDogs(DEMO_DOGS); setLoading(false); return }
-    insforge.database.from('dogs').select('*').eq('verified', true)
     insforge.database
       .from('dogs')
       .select('*')
