@@ -16,6 +16,14 @@ interface MatchWithDogs extends Match {
 
 type PayMethod = 'webpay' | 'mercadopago'
 
+export default function UnlockPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#fcf9f8] flex items-center justify-center"><span className="material-symbols-outlined text-5xl text-[#c3c8c1] animate-spin">progress_activity</span></div>}>
+      <UnlockContent />
+    </Suspense>
+  )
+}
+
 function UnlockContent() {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
@@ -229,14 +237,6 @@ function UnlockContent() {
         </p>
       </main>
     </div>
-  )
-}
-
-export default function UnlockPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-[#fcf9f8] flex items-center justify-center"><span className="material-symbols-outlined text-5xl text-[#c3c8c1] animate-spin">progress_activity</span></div>}>
-      <UnlockContent />
-    </Suspense>
   )
 }
 

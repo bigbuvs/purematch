@@ -13,8 +13,10 @@ const APP_LINKS = [
 ]
 
 const INFO_LINKS = [
-  { label: 'Términos de uso', href: '/terms',    icon: 'gavel' },
-  { label: 'Privacidad',      href: '/privacy',  icon: 'shield' },
+  { label: 'Cómo funciona',   href: '/how-it-works', icon: 'help' },
+  { label: 'Soporte',         href: '/contact',      icon: 'support_agent' },
+  { label: 'Términos de uso', href: '/terms',        icon: 'gavel' },
+  { label: 'Privacidad',      href: '/privacy',      icon: 'shield' },
 ]
 
 const LANDING_LINKS = [

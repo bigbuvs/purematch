@@ -30,6 +30,14 @@ const STATUS_CONFIG = {
   rejected: { label: 'RECHAZADO',   bg: 'bg-[#ffdad6]',   border: 'border-[#ba1a1a]/30', text: 'text-[#ba1a1a]', icon: 'cancel' },
 }
 
+export default function DocumentsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#fcf9f8] flex items-center justify-center"><span className="material-symbols-outlined text-5xl text-[#c3c8c1] animate-spin">progress_activity</span></div>}>
+      <DocumentsContent />
+    </Suspense>
+  )
+}
+
 function DocumentsContent() {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
@@ -339,13 +347,5 @@ function DocumentsContent() {
         </div>
       )}
     </div>
-  )
-}
-
-export default function DocumentsPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-[#fcf9f8] flex items-center justify-center"><span className="material-symbols-outlined text-5xl text-[#c3c8c1] animate-spin">progress_activity</span></div>}>
-      <DocumentsContent />
-    </Suspense>
   )
 }
