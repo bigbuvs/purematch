@@ -1,11 +1,13 @@
 'use client'
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { insforge } from '@/lib/insforge'
+import { useAuth } from '@/context/AuthContext'
 
-export default function AuthPage() {
+function AuthContent() {
   const router = useRouter()
+  const { refresh } = useAuth()
   const searchParams = useSearchParams()
   const next = searchParams.get('next') || '/explore'
   const [tab, setTab] = useState<'login' | 'register'>('login')
@@ -14,11 +16,15 @@ export default function AuthPage() {
   const [error, setError] = useState('')
   const [form, setForm] = useState({ name: '', email: '', password: '' })
 
+  const clearDemo = () => { document.cookie = 'purematch_demo=; path=/; max-age=0' }
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true); setError('')
     const { error } = await insforge.auth.signInWithPassword({ email: form.email, password: form.password })
     if (error) { setError(error.message); setLoading(false); return }
+    clearDemo()
+    await refresh()
     router.push(next)
   }
 
@@ -44,6 +50,8 @@ export default function AuthPage() {
         avatar_url: null,
       }) as any).catch(() => {})
     }
+    clearDemo()
+    await refresh()
     router.push('/onboarding/user')
   }
 
@@ -156,6 +164,14 @@ export default function AuthPage() {
         </div>
       </main>
     </div>
+  )
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={<div className="bg-[#fcf9f8] min-h-screen flex items-center justify-center"><span className="material-symbols-outlined text-5xl text-[#c3c8c1] animate-spin">progress_activity</span></div>}>
+      <AuthContent />
+    </Suspense>
   )
 }
 

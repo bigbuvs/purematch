@@ -54,23 +54,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   const refresh = async () => {
+    // Real session takes priority — always handle inside this block, never fall through to demo
+    if (hasCookie('insforge_csrf_token')) {
+      document.cookie = 'purematch_demo=; path=/; max-age=0'
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data } = await withTimeout(insforge.auth.getCurrentUser() as Promise<any>, 5000)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const u = (data as any)?.user ?? data ?? null
+        if (u) {
+          // Load profile row from users table so pages get name/avatar/zone
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { data: profile } = await (insforge.database.from('users').select('*').eq('id', u.id).single() as any)
+            setUser({ ...(u as User), profile: profile ?? undefined })
+          } catch {
+            setUser(u as User)
+          }
+        } else {
+          setUser(null)
+        }
+      } catch {
+        // Timeout or network error: treat as unauthenticated, not demo
+        setUser(null)
+      }
+      return
+    }
+    // Only reach here when there is no real session cookie at all
     if (hasCookie('purematch_demo')) {
       setUser(DEMO_USER)
       return
     }
-    if (!hasCookie('insforge_csrf_token')) {
-      setUser(null)
-      return
-    }
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data } = await withTimeout(insforge.auth.getCurrentUser() as Promise<any>, 5000)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const u = (data as any)?.user ?? data ?? null
-      setUser(u as User | null)
-    } catch {
-      setUser(null)
-    }
+    setUser(null)
   }
 
   useEffect(() => {
