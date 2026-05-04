@@ -17,11 +17,21 @@ function AuthContent() {
   const [form, setForm] = useState({ name: '', email: '', password: '' })
   const [switchingAccount, setSwitchingAccount] = useState(false)
 
+  // Email verification state — set after register or unverified login
+  const [verifyEmail, setVerifyEmail] = useState('')
+  const [otp, setOtp] = useState('')
+  const [resendCooldown, setResendCooldown] = useState(0)
+
   const clearDemo = () => { document.cookie = 'purematch_demo=; path=/; max-age=0' }
 
-  // Visiting /auth means the user wants to authenticate properly.
-  // Wipe any leftover demo cookie so a real login never falls through to demo.
   useEffect(() => { clearDemo() }, [])
+
+  // Cooldown timer for resend button
+  useEffect(() => {
+    if (resendCooldown <= 0) return
+    const t = setTimeout(() => setResendCooldown(s => s - 1), 1000)
+    return () => clearTimeout(t)
+  }, [resendCooldown])
 
   const isRealSession = !!user && user.id !== 'demo-user'
 
@@ -35,7 +45,18 @@ function AuthContent() {
     e.preventDefault()
     setLoading(true); setError('')
     const { error } = await insforge.auth.signInWithPassword({ email: form.email, password: form.password })
-    if (error) { setError(error.message); setLoading(false); return }
+    if (error) {
+      // InsForge returns this message when email is not verified
+      const needsVerify = /verif|confirm|not verified/i.test(error.message)
+      if (needsVerify) {
+        setVerifyEmail(form.email)
+        setResendCooldown(60)
+      } else {
+        setError(error.message)
+      }
+      setLoading(false)
+      return
+    }
     clearDemo()
     await refresh()
     router.push(next)
@@ -50,8 +71,10 @@ function AuthContent() {
       name: form.name,
     }) as any
     if (error) { setError(error.message); setLoading(false); return }
-    // Pre-create users record so auth ID is linked even if onboarding is skipped
-    const userId = data?.user?.id ?? data?.id
+
+    const registeredUser = data?.user ?? data
+    const userId = registeredUser?.id
+
     if (userId) {
       await (insforge.database.from('users').upsert({
         id: userId,
@@ -63,9 +86,37 @@ function AuthContent() {
         avatar_url: null,
       }) as any).catch(() => {})
     }
+
+    // If email is not yet verified, show the verification step
+    if (registeredUser?.emailVerified === false) {
+      setVerifyEmail(form.email)
+      setResendCooldown(60)
+      setLoading(false)
+      return
+    }
+
+    // Email already verified (e.g. autoConfirm is on) — go straight to onboarding
     clearDemo()
     await refresh()
     router.push('/onboarding/user')
+  }
+
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true); setError('')
+    const { error } = await insforge.auth.verifyEmail({ email: verifyEmail, otp })
+    if (error) { setError(error.message); setLoading(false); return }
+    clearDemo()
+    await refresh()
+    // After verifying, go to onboarding if came from register, otherwise to `next`
+    router.push(tab === 'register' ? '/onboarding/user' : next)
+  }
+
+  const handleResend = async () => {
+    setError('')
+    const { error } = await insforge.auth.resendVerificationEmail({ email: verifyEmail })
+    if (error) { setError(error.message); return }
+    setResendCooldown(60)
   }
 
   const handleOAuth = (provider: 'google' | 'facebook') => {
@@ -76,6 +127,90 @@ function AuthContent() {
     })
   }
 
+  // ── Email verification screen ────────────────────────────────────────────────
+  if (verifyEmail) {
+    return (
+      <div className="bg-[#fcf9f8] min-h-screen flex flex-col">
+        <header className="px-4 h-[60px] flex items-center border-b border-[#c3c8c1]/60 bg-[#fcf9f8]/95 backdrop-blur-sm sticky top-0 z-40">
+          <Link href="/" className="flex items-center gap-2.5">
+            <img src="/isotipo.svg" alt="PureMatch" width={32} height={32} className="rounded-full" />
+            <span className="font-serif font-bold text-[#061b0e] text-[15px] tracking-tight">PureMatch</span>
+          </Link>
+        </header>
+
+        <main className="flex-grow flex flex-col items-center px-5 py-10">
+          <div className="w-full max-w-md">
+            <header className="mb-8 text-center">
+              <div className="w-14 h-14 rounded-full bg-[#e8f5e9] flex items-center justify-center mx-auto mb-4">
+                <span className="material-symbols-outlined text-[28px] text-[#2e7d32]" style={{ fontVariationSettings: "'FILL' 1" }}>mark_email_unread</span>
+              </div>
+              <h1 className="font-serif font-bold text-[#061b0e] text-2xl tracking-tight mb-2">Verifica tu email</h1>
+              <p className="text-[#737973] text-sm">
+                Enviamos un código de 6 dígitos a<br />
+                <span className="font-semibold text-[#061b0e]">{verifyEmail}</span>
+              </p>
+            </header>
+
+            {error && (
+              <div className="bg-[#ffdad6] text-[#93000a] text-[12px] px-4 py-3 rounded-xl mb-4 flex items-start gap-2">
+                <span className="material-symbols-outlined text-[16px] mt-0.5">error</span>
+                {error}
+              </div>
+            )}
+
+            <div className="bg-white border border-[#e4e2e1] rounded-2xl p-6 shadow-[0_2px_12px_rgba(6,27,14,0.04)]">
+              <form onSubmit={handleVerify} className="flex flex-col gap-4">
+                <div className="flex flex-col">
+                  <label className="text-[10px] font-bold tracking-[0.1em] text-[#737973] mb-1.5 ml-1">CÓDIGO DE VERIFICACIÓN</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={6}
+                    value={otp}
+                    onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
+                    placeholder="000000"
+                    required
+                    className="w-full bg-[#fcf9f8] border border-[#c3c8c1] rounded-xl px-4 py-3 text-[20px] text-[#1b1c1c] text-center tracking-[0.3em] placeholder:text-[#a0a5a0] placeholder:tracking-[0.3em] focus:outline-none focus:border-[#061b0e] transition-colors font-mono"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading || otp.length < 6}
+                  className="w-full bg-[#061b0e] text-white text-[12px] font-bold tracking-[0.08em] py-3.5 rounded-full mt-1 hover:bg-[#1b3022] transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+                >
+                  {loading
+                    ? <><span className="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>VERIFICANDO...</>
+                    : 'CONFIRMAR CÓDIGO'}
+                </button>
+              </form>
+
+              <div className="text-center mt-5">
+                <p className="text-[11px] text-[#737973] mb-2">¿No recibiste el código?</p>
+                <button
+                  onClick={handleResend}
+                  disabled={resendCooldown > 0}
+                  className="text-[11px] font-bold text-[#061b0e] underline disabled:text-[#a0a5a0] disabled:no-underline transition-colors"
+                >
+                  {resendCooldown > 0 ? `Reenviar en ${resendCooldown}s` : 'Reenviar código'}
+                </button>
+              </div>
+            </div>
+
+            <button
+              onClick={() => { setVerifyEmail(''); setOtp(''); setError('') }}
+              className="flex items-center gap-1.5 text-[11px] text-[#737973] mt-5 mx-auto hover:text-[#1b1c1c] transition-colors"
+            >
+              <span className="material-symbols-outlined text-[14px]">arrow_back</span>
+              Volver al inicio de sesión
+            </button>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
+  // ── Normal login / register screen ──────────────────────────────────────────
   return (
     <div className="bg-[#fcf9f8] min-h-screen flex flex-col">
       {/* Top bar lite — isotipo only, links home */}
@@ -98,7 +233,7 @@ function AuthContent() {
             <p className="text-[#737973] text-sm">Registro digital de linaje canino</p>
           </header>
 
-          {/* Active session banner — when a real session is already in place */}
+          {/* Active session banner */}
           {!authLoading && isRealSession && (
             <div className="bg-white border border-[#e4e2e1] rounded-2xl p-5 mb-6 flex flex-col gap-3 shadow-[0_2px_12px_rgba(6,27,14,0.04)]">
               <div className="flex items-center gap-3">
@@ -131,7 +266,7 @@ function AuthContent() {
             </div>
           )}
 
-          {/* Tabs — hidden when a real session already exists */}
+          {/* Tabs */}
           {!isRealSession && (
           <div className="bg-white border border-[#e4e2e1] rounded-full p-1 mb-6 flex">
             {(['login', 'register'] as const).map(t => (
@@ -155,7 +290,7 @@ function AuthContent() {
             </div>
           )}
 
-          {/* Form card — hidden when a real session already exists */}
+          {/* Form card */}
           {!isRealSession && (
           <div className="bg-white border border-[#e4e2e1] rounded-2xl p-6 shadow-[0_2px_12px_rgba(6,27,14,0.04)]">
             {tab === 'login' ? (
