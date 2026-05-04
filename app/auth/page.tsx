@@ -28,7 +28,7 @@ function AuthContent() {
   const handleSwitchAccount = async () => {
     setSwitchingAccount(true)
     await signOut()
-    setSwitchingAccount(false)
+    router.refresh()
   }
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -111,13 +111,13 @@ function AuthContent() {
                 </div>
               </div>
               <div className="flex flex-col gap-2">
-                <button
-                  onClick={() => router.push(next)}
+                <Link
+                  href={next}
                   className="w-full bg-[#061b0e] text-white text-[11px] font-bold tracking-[0.08em] py-2.5 rounded-full hover:bg-[#1b3022] transition-colors flex items-center justify-center gap-2"
                 >
                   <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
                   IR A LA APP
-                </button>
+                </Link>
                 <button
                   onClick={handleSwitchAccount}
                   disabled={switchingAccount}
