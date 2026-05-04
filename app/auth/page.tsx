@@ -7,7 +7,7 @@ import { useAuth } from '@/context/AuthContext'
 
 function AuthContent() {
   const router = useRouter()
-  const { refresh } = useAuth()
+  const { user, loading: authLoading, signOut, refresh } = useAuth()
   const searchParams = useSearchParams()
   const next = searchParams.get('next') || '/explore'
   const [tab, setTab] = useState<'login' | 'register'>('login')
@@ -15,12 +15,21 @@ function AuthContent() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState({ name: '', email: '', password: '' })
+  const [switchingAccount, setSwitchingAccount] = useState(false)
 
   const clearDemo = () => { document.cookie = 'purematch_demo=; path=/; max-age=0' }
 
   // Visiting /auth means the user wants to authenticate properly.
   // Wipe any leftover demo cookie so a real login never falls through to demo.
   useEffect(() => { clearDemo() }, [])
+
+  const isRealSession = !!user && user.id !== 'demo-user'
+
+  const handleSwitchAccount = async () => {
+    setSwitchingAccount(true)
+    await signOut()
+    setSwitchingAccount(false)
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -89,7 +98,41 @@ function AuthContent() {
             <p className="text-[#737973] text-sm">Registro digital de linaje canino</p>
           </header>
 
-          {/* Tabs */}
+          {/* Active session banner — when a real session is already in place */}
+          {!authLoading && isRealSession && (
+            <div className="bg-white border border-[#e4e2e1] rounded-2xl p-5 mb-6 flex flex-col gap-3 shadow-[0_2px_12px_rgba(6,27,14,0.04)]">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#061b0e] text-white flex items-center justify-center flex-shrink-0">
+                  <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>account_circle</span>
+                </div>
+                <div className="min-w-0 flex-grow">
+                  <p className="text-[10px] font-bold tracking-[0.1em] text-[#737973]">SESIÓN ACTIVA</p>
+                  <p className="text-sm font-semibold text-[#061b0e] truncate">{user?.email}</p>
+                </div>
+              </div>
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={() => router.push(next)}
+                  className="w-full bg-[#061b0e] text-white text-[11px] font-bold tracking-[0.08em] py-2.5 rounded-full hover:bg-[#1b3022] transition-colors flex items-center justify-center gap-2"
+                >
+                  <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                  IR A LA APP
+                </button>
+                <button
+                  onClick={handleSwitchAccount}
+                  disabled={switchingAccount}
+                  className="w-full border border-[#c3c8c1] text-[#737973] text-[11px] font-bold tracking-[0.08em] py-2.5 rounded-full hover:border-[#061b0e] hover:text-[#061b0e] transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+                >
+                  {switchingAccount
+                    ? <><span className="material-symbols-outlined text-[14px] animate-spin">progress_activity</span>CERRANDO SESIÓN...</>
+                    : <><span className="material-symbols-outlined text-[14px]">logout</span>CERRAR SESIÓN Y ENTRAR CON OTRA CUENTA</>}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Tabs — hidden when a real session already exists */}
+          {!isRealSession && (
           <div className="bg-white border border-[#e4e2e1] rounded-full p-1 mb-6 flex">
             {(['login', 'register'] as const).map(t => (
               <button
@@ -103,15 +146,17 @@ function AuthContent() {
               </button>
             ))}
           </div>
+          )}
 
-          {error && (
+          {error && !isRealSession && (
             <div className="bg-[#ffdad6] text-[#93000a] text-[12px] px-4 py-3 rounded-xl mb-4 flex items-start gap-2">
               <span className="material-symbols-outlined text-[16px] mt-0.5">error</span>
               {error}
             </div>
           )}
 
-          {/* Form card */}
+          {/* Form card — hidden when a real session already exists */}
+          {!isRealSession && (
           <div className="bg-white border border-[#e4e2e1] rounded-2xl p-6 shadow-[0_2px_12px_rgba(6,27,14,0.04)]">
             {tab === 'login' ? (
               <form onSubmit={handleLogin} className="flex flex-col gap-4">
@@ -167,7 +212,9 @@ function AuthContent() {
               </button>
             </div>
           </div>
+          )}
 
+          {!isRealSession && (
           <p className="text-[10px] text-[#a0a5a0] text-center mt-6 leading-relaxed">
             Al continuar aceptas los{' '}
             <Link href="/terms" className="underline hover:text-[#061b0e]">términos de uso</Link>
@@ -175,6 +222,7 @@ function AuthContent() {
             <Link href="/privacy" className="underline hover:text-[#061b0e]">política de privacidad</Link>.<br/>
             Datos protegidos con cifrado SSL.
           </p>
+          )}
         </div>
       </main>
     </div>
