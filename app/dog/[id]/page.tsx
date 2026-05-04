@@ -83,6 +83,7 @@ export default function DogProfilePage() {
     </div>
   )
 
+  const isOwner = !!user && dog.owner_id === user.id
   const docLabels: Record<string, string> = { pedigree: 'Certificado KCC', vaccines: 'Cartilla de Vacunas', health: 'Prueba de Displasia' }
 
   return (
@@ -113,6 +114,17 @@ export default function DogProfilePage() {
             <h1 className="font-serif font-bold text-white text-3xl tracking-tight leading-tight">{dog.name}</h1>
             <p className="text-white/85 text-sm mt-1">{dog.breed} · {dog.age} · {dog.sex}</p>
           </div>
+
+          {/* Edit button (owner only) */}
+          {isOwner && (
+            <Link
+              href={`/dog/${id}/edit`}
+              className="absolute top-4 left-4 bg-[#061b0e]/70 backdrop-blur-sm text-white text-[10px] font-bold tracking-[0.08em] px-3 py-1.5 rounded-full flex items-center gap-1.5 hover:bg-[#061b0e] transition-colors"
+            >
+              <span className="material-symbols-outlined text-[14px]">edit</span>
+              EDITAR
+            </Link>
+          )}
 
           {/* Score badge top-right */}
           {dog.score !== undefined && dog.score !== null && (

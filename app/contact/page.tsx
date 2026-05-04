@@ -54,7 +54,7 @@ export default function ContactPage() {
         {/* Contact methods */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
           <a
-            href="mailto:hola@purematch.cl"
+            href="mailto:contacto@purematch.cl"
             className="flex items-center gap-3 bg-white border border-[#e4e2e1] rounded-2xl px-4 py-4 hover:border-[#061b0e] hover:shadow-[0_4px_16px_rgba(6,27,14,0.08)] transition-all group"
           >
             <div className="w-10 h-10 rounded-full bg-[#061b0e] flex items-center justify-center flex-shrink-0">
@@ -62,12 +62,12 @@ export default function ContactPage() {
             </div>
             <div>
               <p className="text-[10px] font-bold tracking-[0.08em] text-[#737973] mb-0.5">EMAIL</p>
-              <p className="text-[13px] font-semibold text-[#061b0e] group-hover:underline">hola@purematch.cl</p>
+              <p className="text-[13px] font-semibold text-[#061b0e] group-hover:underline">contacto@purematch.cl</p>
             </div>
           </a>
 
           <a
-            href="https://wa.me/56912345678?text=Hola%2C%20tengo%20una%20consulta%20sobre%20PureMatch"
+            href="https://wa.me/56944657212?text=Hola%2C%20tengo%20una%20consulta%20sobre%20PureMatch"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 bg-white border border-[#e4e2e1] rounded-2xl px-4 py-4 hover:border-[#25d366] hover:shadow-[0_4px_16px_rgba(37,211,102,0.12)] transition-all group"
@@ -79,7 +79,7 @@ export default function ContactPage() {
             </div>
             <div>
               <p className="text-[10px] font-bold tracking-[0.08em] text-[#737973] mb-0.5">WHATSAPP</p>
-              <p className="text-[13px] font-semibold text-[#061b0e] group-hover:underline">+56 9 1234 5678</p>
+              <p className="text-[13px] font-semibold text-[#061b0e] group-hover:underline">+56 9 4465 7212</p>
             </div>
           </a>
         </div>

@@ -3,16 +3,17 @@ import type { NextRequest } from 'next/server'
 
 const PROTECTED = ['/explore', '/matches', '/profile', '/dog', '/onboarding', '/documents', '/unlock']
 
-const hasAnySession = (request: NextRequest): boolean =>
-  request.cookies.has('insforge_csrf_token') || request.cookies.has('purematch_demo')
+function hasAnyAuth(request: NextRequest): boolean {
+  return request.cookies.has('insforge_csrf_token') || request.cookies.has('purematch_demo')
+}
 
-export function middleware(request: NextRequest) {
+export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   const isProtected = PROTECTED.some(p => pathname === p || pathname.startsWith(p + '/'))
 
   // Protected routes accept either real or demo session
-  if (isProtected && !hasAnySession(request)) {
+  if (isProtected && !hasAnyAuth(request)) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth'
     url.searchParams.set('next', pathname)
@@ -25,5 +26,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|public/).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|public/).*)'  ],
 }
