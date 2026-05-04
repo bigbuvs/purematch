@@ -154,6 +154,14 @@ export default function AdminPage() {
               {t.label}
             </button>
           ))}
+          <div className="h-px bg-[#e4e2e1] my-2" />
+          <button
+            onClick={() => router.push('/explore')}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-left w-full transition-colors text-sm text-[#737973] hover:bg-[#f0eded] hover:text-[#1b1c1c]"
+          >
+            <span className="material-symbols-outlined text-base">arrow_back</span>
+            Volver a la app
+          </button>
         </nav>
         <div className="p-4 border-t border-[#e4e2e1]">
           <div className="flex items-center gap-3">
@@ -172,6 +180,13 @@ export default function AdminPage() {
       <div className="flex-grow flex flex-col min-w-0">
         {/* Mobile tab bar */}
         <div className="md:hidden flex border-b border-[#e4e2e1] bg-[#f6f3f2] overflow-x-auto">
+          <button
+            onClick={() => router.push('/explore')}
+            className="flex items-center gap-1.5 px-4 py-3 text-[11px] font-bold tracking-[0.08em] whitespace-nowrap text-[#737973] hover:text-[#061b0e] flex-shrink-0 border-r border-[#e4e2e1]"
+          >
+            <span className="material-symbols-outlined text-[14px]">arrow_back</span>
+            APP
+          </button>
           {TAB_CONFIG.map(t => (
             <button
               key={t.id}

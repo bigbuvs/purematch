@@ -1,7 +1,5 @@
 'use client'
 import Link from 'next/link'
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 
 const HERO_IMG = 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1920&q=80'
@@ -45,11 +43,6 @@ const breeds = [
 
 export default function LandingPage() {
   const { user, loading } = useAuth()
-  const router = useRouter()
-
-  useEffect(() => {
-    if (!loading && user) router.replace('/explore')
-  }, [user, loading])
 
   if (loading) {
     return (
