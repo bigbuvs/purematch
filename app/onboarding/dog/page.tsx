@@ -46,6 +46,13 @@ export default function OnboardingDogPage() {
     if (!user) return
     setLoading(true); setError('')
 
+    // Ensure user row exists before inserting dog (FK constraint)
+    await (insforge.database.from('users').upsert({
+      id: user.id,
+      email: user.email ?? '',
+      name: user.profile?.name ?? user.user_metadata?.name ?? user.name ?? user.email?.split('@')[0] ?? '',
+    }, { onConflict: 'id' }) as any).catch(() => {})
+
     const photoUrls: string[] = []
     for (const file of photos) {
       const ext = file.name.split('.').pop()
