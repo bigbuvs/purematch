@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-export async function GET() {
-  const res = NextResponse.redirect(
-    new URL('/explore', process.env.NEXT_PUBLIC_APP_URL ?? 'https://purematch-app.vercel.app')
-  )
+export async function GET(request: NextRequest) {
+  const res = NextResponse.redirect(new URL('/explore', request.url))
   res.cookies.set('purematch_demo', '1', {
     path: '/',
     maxAge: 60 * 60 * 24,

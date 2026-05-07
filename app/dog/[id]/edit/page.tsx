@@ -108,9 +108,15 @@ export default function EditDogPage() {
   )
 
   if (notOwner || !dog) return (
-    <div className="min-h-screen bg-[#fcf9f8] flex flex-col items-center justify-center gap-4">
+    <div className="min-h-screen bg-[#fcf9f8] flex flex-col items-center justify-center gap-4 px-6 text-center">
       <span className="material-symbols-outlined text-5xl text-[#c3c8c1]">block</span>
       <p className="text-[#737973] text-sm">Sin permiso para editar este perfil.</p>
+      <button
+        onClick={() => router.back()}
+        className="text-[11px] font-bold tracking-[0.08em] text-[#061b0e] border border-[#061b0e] px-6 py-2.5 rounded-full hover:bg-[#061b0e] hover:text-white transition-colors"
+      >
+        VOLVER
+      </button>
     </div>
   )
 

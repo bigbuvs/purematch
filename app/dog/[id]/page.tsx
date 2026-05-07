@@ -29,20 +29,25 @@ export default function DogProfilePage() {
       setDog(dogData)
       setDocs(docsData ?? [])
 
-      if (user) {
+      if (user && user.id !== 'demo-user') {
         const { data: myDogs } = await insforge.database.from('dogs').select('id').eq('owner_id', user.id)
         if (myDogs?.length) {
           const myDogIds = myDogs.map(d => d.id)
           const { data: existing } = await insforge.database
             .from('matches')
-            .select('id')
+            .select('id, status_a, status_b, dog_a_id')
             .or(
               myDogIds.map(mid => `and(dog_a_id.eq.${mid},dog_b_id.eq.${id})`).join(',') +
               ',' +
               myDogIds.map(mid => `and(dog_a_id.eq.${id},dog_b_id.eq.${mid})`).join(',')
             )
             .limit(1)
-          if (existing?.length) setMatchSent(true)
+          if (existing?.length) {
+            const m = existing[0] as any
+            const iAmA = myDogIds.includes(m.dog_a_id)
+            const myStatus = iAmA ? m.status_a : m.status_b
+            if (myStatus !== 'rejected') setMatchSent(true)
+          }
         }
       }
 
@@ -84,6 +89,7 @@ export default function DogProfilePage() {
   )
 
   const isOwner = !!user && dog.owner_id === user.id
+  const isDemo = user?.id === 'demo-user'
   const docLabels: Record<string, string> = { pedigree: 'Certificado KCC', vaccines: 'Cartilla de Vacunas', health: 'Prueba de Displasia' }
 
   return (
@@ -190,8 +196,8 @@ export default function DogProfilePage() {
             </div>
           )}
 
-          {/* Match action card */}
-          <div className="bg-gradient-to-br from-[#061b0e] to-[#1b3022] rounded-2xl p-6 flex flex-col gap-3 text-white shadow-[0_8px_32px_rgba(6,27,14,0.15)]">
+          {/* Match action card — not shown to the dog's owner */}
+          {!isOwner && <div className="bg-gradient-to-br from-[#061b0e] to-[#1b3022] rounded-2xl p-6 flex flex-col gap-3 text-white shadow-[0_8px_32px_rgba(6,27,14,0.15)]">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-[#fed488] text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>lock</span>
               <p className="text-[10px] font-bold tracking-[0.1em] text-[#fed488]">CONTACTO RESERVADO</p>
@@ -207,7 +213,7 @@ export default function DogProfilePage() {
             ) : (
               <button
                 onClick={handleMatch}
-                disabled={matchLoading || !user}
+                disabled={matchLoading || !user || isDemo}
                 className="w-full bg-[#fed488] text-[#261900] text-[12px] font-bold tracking-[0.08em] py-3.5 rounded-full hover:bg-[#ffdea5] transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
               >
                 {matchLoading
@@ -221,7 +227,13 @@ export default function DogProfilePage() {
                 <Link href="/auth" className="text-[#fed488] underline">Inicia sesión</Link> para solicitar un match.
               </p>
             )}
-          </div>
+            {isDemo && (
+              <p className="text-white/60 text-[11px] text-center">
+                Esta función no está disponible en modo demo.
+              </p>
+            )}
+          </div>}
+
         </div>
       </main>
 

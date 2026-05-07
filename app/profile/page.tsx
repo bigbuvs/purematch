@@ -199,10 +199,10 @@ export default function ProfilePage() {
               {[
                 { icon: 'person', label: 'Datos personales', action: () => router.push('/edit-profile') },
                 { icon: 'description', label: 'Documentos', action: () => router.push('/documents') },
-                { icon: 'notifications', label: 'Notificaciones', action: () => {} },
-                { icon: 'lock', label: 'Seguridad', action: () => {} },
-                { icon: 'help', label: 'Ayuda y soporte', action: () => {} },
-                ...(user?.email === 'a@a.com' ? [{ icon: 'admin_panel_settings', label: 'Panel de administración', action: () => router.push('/admin') }] : []),
+                { icon: 'notifications', label: 'Notificaciones', action: () => router.push('/notifications') },
+                { icon: 'lock', label: 'Seguridad', action: () => router.push('/security') },
+                { icon: 'help', label: 'Ayuda y soporte', action: () => router.push('/contact') },
+                ...(['a@a.com', 'contacto@purematch.cl'].includes(user?.email ?? '') ? [{ icon: 'admin_panel_settings', label: 'Panel de administración', action: () => router.push('/admin') }] : []),
               ].map(item => (
                 <button
                   key={item.label}

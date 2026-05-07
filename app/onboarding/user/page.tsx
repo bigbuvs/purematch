@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import TopBar from '@/components/TopBar'
@@ -14,6 +14,19 @@ export default function OnboardingUserPage() {
   const [form, setForm] = useState({ name: '', phone: '', zone: '', rut: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (!user || user.id === 'demo-user') return
+    insforge.database.from('users').select('name, phone, zone, rut').eq('id', user.id).single().then(({ data }) => {
+      if (!data) return
+      setForm({
+        name: data.name ?? '',
+        phone: data.phone ?? '',
+        zone: data.zone ?? '',
+        rut: data.rut ?? '',
+      })
+    })
+  }, [user])
   const allFilled = form.name && form.phone && form.zone
 
   const handleContinue = async (e: React.FormEvent) => {

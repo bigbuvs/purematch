@@ -90,6 +90,7 @@ export default function MatchesPage() {
     const inc: MatchCard[] = []
 
     for (const m of matches ?? []) {
+      if (!m.dog_a || !m.dog_b) continue
       const iAmA = dogIds.includes((m.dog_a as any).id)
       const myStatus    = iAmA ? m.status_a : m.status_b
       const theirStatus = iAmA ? m.status_b : m.status_a
@@ -147,6 +148,14 @@ export default function MatchesPage() {
     setResponding(null)
     await load()
     if (accept) setTab('mutual')
+  }
+
+  const handleCancel = async (card: MatchCard) => {
+    if (isDemo) return
+    setResponding(card.matchId)
+    await insforge.database.from('matches').delete().eq('id', card.matchId)
+    setResponding(null)
+    await load()
   }
 
   const tabs = [
@@ -352,7 +361,7 @@ export default function MatchesPage() {
                           <div className="border-t border-[#e4e2e1] px-4 py-3 flex items-center justify-between">
                             <button
                               disabled={responding === m.matchId || isDemo}
-                              onClick={() => handleRespond(m, false)}
+                              onClick={() => handleCancel(m)}
                               className="flex items-center gap-1.5 text-[10px] font-bold tracking-[0.08em] text-[#737973] hover:text-[#ba1a1a] transition-colors disabled:opacity-40"
                             >
                               <span className="material-symbols-outlined text-sm">close</span>

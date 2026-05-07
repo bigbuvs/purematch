@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import { useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import NavDrawer from '@/components/NavDrawer'
 
@@ -23,12 +23,7 @@ const breeds = [
 
 export default function LandingPage() {
   const { user, loading } = useAuth()
-  const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
-
-  useEffect(() => {
-    if (!loading && user) router.replace('/explore')
-  }, [user, loading])
 
   if (loading) {
     return (
@@ -71,7 +66,7 @@ export default function LandingPage() {
         {/* ── HERO ── */}
         <section className="relative min-h-[100dvh] flex flex-col">
           <div className="absolute inset-0">
-            <img src={HERO_IMG} alt="PureMatch" className="w-full h-full object-cover" loading="eager" />
+            <Image src={HERO_IMG} alt="PureMatch" fill className="object-cover" priority />
             <div className="absolute inset-0 bg-gradient-to-r from-[#061b0e]/90 via-[#061b0e]/70 to-[#061b0e]/30" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#061b0e]/60 via-transparent to-transparent" />
           </div>
@@ -139,7 +134,7 @@ export default function LandingPage() {
               <Link key={dog.name} href="/auth" className="group block">
                 <div className="bg-white border border-[#c3c8c1] rounded-2xl overflow-hidden hover:shadow-[0_12px_40px_rgba(6,27,14,0.12)] transition-all duration-300">
                   <div className="aspect-[4/3] relative overflow-hidden">
-                    <img src={dog.img} alt={dog.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <Image src={dog.img} alt={dog.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                     <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-[#061b0e]/80 backdrop-blur-sm px-3 py-1 rounded-full">
                       <span className="material-symbols-outlined text-[#fed488] text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                       <span className="text-[9px] font-bold text-white tracking-[0.1em]">VERIFICADO</span>
@@ -184,7 +179,7 @@ export default function LandingPage() {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {breeds.map(b => (
                 <Link key={b.name} href="/auth" className="group relative aspect-square rounded-xl overflow-hidden">
-                  <img src={b.img} alt={b.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <Image src={b.img} alt={b.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#061b0e]/90 via-[#061b0e]/20 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-4">
                     <p className="font-serif font-semibold text-white text-base leading-tight">{b.name}</p>
@@ -228,11 +223,12 @@ export default function LandingPage() {
 
             {/* Visual */}
             <div className="relative">
-              <div className="aspect-square rounded-3xl overflow-hidden bg-[#f0eded]">
-                <img
+              <div className="aspect-square rounded-3xl overflow-hidden bg-[#f0eded] relative">
+                <Image
                   src="https://images.unsplash.com/photo-1601758125946-6ec2ef64daf8?auto=format&fit=crop&w=800&h=800&q=80"
                   alt="Criadores de perros"
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                 />
               </div>
               {/* Floating card */}
@@ -353,7 +349,7 @@ export default function LandingPage() {
         {/* ── FINAL CTA ── */}
         <section className="relative px-6 md:px-12 py-24 overflow-hidden bg-[#061b0e]">
           <div className="absolute inset-0 opacity-20">
-            <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=1920&q=60" alt="" className="w-full h-full object-cover" />
+            <Image src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=1920&q=60" alt="" fill className="object-cover" />
           </div>
           <div className="absolute inset-0 bg-gradient-to-b from-[#061b0e]/80 to-[#061b0e]" />
 

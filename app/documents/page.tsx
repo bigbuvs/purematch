@@ -44,7 +44,7 @@ function DocumentsContent() {
   const searchParams = useSearchParams()
 
   const [dogs, setDogs] = useState<Dog[]>([])
-  const [selectedDogId, setSelectedDogId] = useState<string | null>(searchParams.get('dog_id'))
+  const [selectedDogId, setSelectedDogId] = useState<string | null>(null)
   const [existingDocs, setExistingDocs] = useState<Document[]>([])
   const [uploading, setUploading] = useState<Partial<Record<DocType, boolean>>>({})
   const [errors, setErrors] = useState<Partial<Record<DocType, string>>>({})
@@ -61,7 +61,12 @@ function DocumentsContent() {
     insforge.database.from('dogs').select('*').eq('owner_id', user.id).then(({ data }) => {
       const list = data ?? []
       setDogs(list)
-      if (!selectedDogId && list.length > 0) setSelectedDogId(list[0].id)
+      const urlDogId = searchParams.get('dog_id')
+      if (urlDogId && list.some(d => d.id === urlDogId)) {
+        setSelectedDogId(urlDogId)
+      } else if (list.length > 0) {
+        setSelectedDogId(list[0].id)
+      }
       setPageLoading(false)
     })
   }, [user, authLoading])
@@ -75,8 +80,14 @@ function DocumentsContent() {
 
   const getDoc = (type: DocType) => existingDocs.find(d => d.type === type)
 
+  const ALLOWED_MIME = new Set(['application/pdf', 'image/jpeg', 'image/png'])
+
   const handleUpload = async (type: DocType, file: File) => {
     if (!user || !selectedDogId) return
+    if (!ALLOWED_MIME.has(file.type)) {
+      setErrors(e => ({ ...e, [type]: 'Solo se permiten PDF, JPG o PNG' }))
+      return
+    }
     if (file.size > 10 * 1024 * 1024) {
       setErrors(e => ({ ...e, [type]: 'El archivo supera 10 MB' }))
       return
@@ -114,7 +125,15 @@ function DocumentsContent() {
   const handleSubmit = async () => {
     if (!selectedDogId) return
     setSubmitting(true)
-    await new Promise(r => setTimeout(r, 600))
+    const { data } = await insforge.database.from('documents')
+      .select('type').eq('dog_id', selectedDogId)
+    const uploadedTypes = new Set((data ?? []).map((d: { type: string }) => d.type))
+    const allRequired = DOC_ZONES.filter(d => d.required).every(d => uploadedTypes.has(d.id))
+    if (!allRequired) {
+      setErrors({ pedigree: 'Faltan documentos obligatorios. Por favor súbelos antes de enviar.' })
+      setSubmitting(false)
+      return
+    }
     setSubmitted(true)
     setSubmitting(false)
   }
