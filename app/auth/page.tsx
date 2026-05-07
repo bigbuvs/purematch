@@ -249,13 +249,13 @@ function AuthContent() {
                 </div>
               </div>
               <div className="flex flex-col gap-2">
-                <Link
-                  href={next}
+                <button
+                  onClick={() => { window.location.href = next }}
                   className="w-full bg-[#061b0e] text-white text-[11px] font-bold tracking-[0.08em] py-2.5 rounded-full hover:bg-[#1b3022] transition-colors flex items-center justify-center gap-2"
                 >
                   <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
                   IR A LA APP
-                </Link>
+                </button>
                 <button
                   onClick={handleSwitchAccount}
                   disabled={switchingAccount}
