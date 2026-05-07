@@ -11,18 +11,22 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       const dog = await res.json()
       const title = `${dog.name} · ${dog.breed} — PureMatch`
       const desc = `${dog.sex ?? ''} · ${dog.age ?? ''} · ${dog.zone ?? 'Chile'}. Perfil verificado en PureMatch.`.trim()
-      const image = dog.photo ?? `${APP_URL}/og-default.png`
+      const image = dog.photo ?? null
       return {
         title,
         description: desc,
-        openGraph: { title, description: desc, images: [{ url: image, width: 600, height: 600 }], type: 'profile' },
-        twitter: { card: 'summary_large_image', title, description: desc, images: [image] },
+        ...(image ? {
+          openGraph: { title, description: desc, images: [{ url: image, width: 600, height: 600 }], type: 'profile' },
+          twitter: { card: 'summary_large_image', title, description: desc, images: [image] },
+        } : {
+          openGraph: { title, description: desc, type: 'profile' },
+        }),
       }
     }
   } catch {}
   return {
     title: 'Perfil de ejemplar — PureMatch',
-    openGraph: { title: 'Perfil de ejemplar — PureMatch', images: [`${APP_URL}/og-default.png`] },
+    openGraph: { title: 'Perfil de ejemplar — PureMatch' },
   }
 }
 

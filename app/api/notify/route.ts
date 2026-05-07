@@ -14,6 +14,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing params' }, { status: 400 })
     }
 
+    // Verify the match actually exists and the dog IDs match — prevents spam via arbitrary IDs
+    const { data: match } = await db.database.from('matches').select('dog_a_id, dog_b_id').eq('id', matchId).single()
+    const validPair = match && (
+      (match.dog_a_id === senderDogId && match.dog_b_id === receiverDogId) ||
+      (match.dog_b_id === senderDogId && match.dog_a_id === receiverDogId)
+    )
+    if (!validPair) return NextResponse.json({ error: 'Invalid match' }, { status: 403 })
+
     // Get sender dog info
     const { data: senderDog } = await db.database.from('dogs').select('name, breed').eq('id', senderDogId).single()
     // Get receiver dog + owner info

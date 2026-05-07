@@ -9,7 +9,8 @@ function AuthContent() {
   const router = useRouter()
   const { user, loading: authLoading, signOut, refresh } = useAuth()
   const searchParams = useSearchParams()
-  const next = searchParams.get('next') || '/explore'
+  const rawNext = searchParams.get('next') ?? ''
+  const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/explore'
   const [tab, setTab] = useState<'login' | 'register'>('login')
   const [showPass, setShowPass] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -219,9 +220,11 @@ function AuthContent() {
           <img src="/isotipo.svg" alt="PureMatch" width={32} height={32} className="rounded-full" />
           <span className="font-serif font-bold text-[#061b0e] text-[15px] tracking-tight">PureMatch</span>
         </Link>
-        <Link href="/api/demo" className="text-[10px] font-bold tracking-[0.1em] text-[#775a19] bg-[#fed488]/30 border border-[#fed488]/60 px-3 py-1.5 rounded-full hover:bg-[#fed488]/50 transition-colors">
-          MODO DEMO
-        </Link>
+        {!isRealSession && (
+          <Link href="/api/demo" className="text-[10px] font-bold tracking-[0.1em] text-[#775a19] bg-[#fed488]/30 border border-[#fed488]/60 px-3 py-1.5 rounded-full hover:bg-[#fed488]/50 transition-colors">
+            MODO DEMO
+          </Link>
+        )}
       </header>
 
       <main className="flex-grow flex flex-col items-center px-5 py-10">

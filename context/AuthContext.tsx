@@ -94,6 +94,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false)
     }
     load()
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') refresh()
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
   }, [])
 
   const signOut = async () => {

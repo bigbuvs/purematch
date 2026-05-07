@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@insforge/sdk'
 
-const SEED_SECRET = 'purematch-seed-2026'
+const SEED_SECRET = process.env.SEED_SECRET ?? 'purematch-seed-2026'
 
 const db = createClient({
   baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL ?? '',

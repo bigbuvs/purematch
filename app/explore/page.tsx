@@ -18,7 +18,7 @@ const DEMO_DOGS: Dog[] = [
   { id: 'd6', owner_id: 'o6', name: 'Max vom Rhein',       breed: 'German Shepherd',  age: '5 años', sex: 'Macho', zone: 'Maipú, RM',        photos: ['https://images.unsplash.com/photo-1568572933382-74d440642117?w=600&h=800&fit=crop'], pedigree_number: 'KCC-2020-GS-00192', verified: true, score: 95, created_at: '' },
 ]
 
-const ALL_BREEDS = ['Todos', 'Border Collie', 'Golden Retriever', 'Labrador Retriever', 'Poodle', 'Husky Siberiano', 'German Shepherd', 'Beagle', 'Bulldog Inglés', 'Dachshund', 'Chihuahua']
+const ALL_BREEDS = ['Todos', 'Border Collie', 'Golden Retriever', 'Labrador Retriever', 'Poodle', 'Husky Siberiano', 'German Shepherd', 'Beagle', 'Bulldog Inglés', 'Dachshund', 'Chihuahua', 'Boxer', 'Rottweiler']
 const ALL_ZONES = ['Todos', 'Las Condes', 'Providencia', 'Vitacura', 'La Reina', 'Ñuñoa', 'Peñalolén', 'Macul']
 
 export default function ExplorePage() {
@@ -135,7 +135,7 @@ export default function ExplorePage() {
               {/* ── CARD GRID (2 cols portrait) ── */}
               <div className="grid grid-cols-2 gap-3">
                 {filtered.map(dog => (
-                  <Link key={dog.id} href={isDemo ? '#' : `/dog/${dog.id}`} className="block group">
+                  <Link key={dog.id} href={`/dog/${dog.id}`} className="block group">
                     <div className="bg-white border border-[#e4e2e1] rounded-2xl overflow-hidden hover:shadow-[0_8px_32px_rgba(6,27,14,0.12)] transition-all duration-300">
 
                       {/* Photo — portrait ratio */}

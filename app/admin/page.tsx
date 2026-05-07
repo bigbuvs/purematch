@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { insforge } from '@/lib/insforge'
 import { useAuth } from '@/context/AuthContext'
@@ -98,19 +98,28 @@ export default function AdminPage() {
 
   const loadStats = useCallback(async () => {
     setStatsLoading(true)
-    const [{ data: usersData }, { data: dogsData }, { data: docsData }, { data: matchesData }] = await Promise.all([
-      insforge.database.from('users').select('id'),
-      insforge.database.from('dogs').select('id, verified'),
-      insforge.database.from('documents').select('id, status'),
-      insforge.database.from('matches').select('id, contact_unlocked'),
+    const [
+      { count: usersCount },
+      { count: dogsCount },
+      { count: verifiedCount },
+      { count: pendingDocsCount },
+      { count: matchesCount },
+      { count: unlockedCount },
+    ] = await Promise.all([
+      insforge.database.from('users').select('*', { count: 'exact', head: true }),
+      insforge.database.from('dogs').select('*', { count: 'exact', head: true }),
+      insforge.database.from('dogs').select('*', { count: 'exact', head: true }).eq('verified', true),
+      insforge.database.from('documents').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+      insforge.database.from('matches').select('*', { count: 'exact', head: true }),
+      insforge.database.from('matches').select('*', { count: 'exact', head: true }).eq('contact_unlocked', true),
     ])
     setStats({
-      users: usersData?.length ?? 0,
-      dogs: dogsData?.length ?? 0,
-      verifiedDogs: (dogsData as any[] ?? []).filter((d: any) => d.verified).length,
-      pendingDocs: (docsData as any[] ?? []).filter((d: any) => d.status === 'pending').length,
-      totalMatches: matchesData?.length ?? 0,
-      unlockedMatches: (matchesData as any[] ?? []).filter((m: any) => m.contact_unlocked).length,
+      users: usersCount ?? 0,
+      dogs: dogsCount ?? 0,
+      verifiedDogs: verifiedCount ?? 0,
+      pendingDocs: pendingDocsCount ?? 0,
+      totalMatches: matchesCount ?? 0,
+      unlockedMatches: unlockedCount ?? 0,
     })
     setStatsLoading(false)
   }, [])
@@ -278,10 +287,12 @@ function ValidacionesTab({ onAction }: { onAction: () => void }) {
         (dogDocs as any[] ?? []).some((d: any) => d.type === t && d.status === 'approved')
       )
       if (allApproved) {
-        await insforge.database.from('dogs').update({ verified: true, score: 80 }).eq('id', dogId)
+        const { data: existingDog } = await insforge.database.from('dogs').select('score').eq('id', dogId).single()
+        const scoreUpdate = (existingDog?.score ?? 0) === 0 ? { score: 80 } : {}
+        await insforge.database.from('dogs').update({ verified: true, ...scoreUpdate }).eq('id', dogId)
       }
     }
-    if (status === 'rejected') {
+    if (status === 'rejected' || status === 'pending') {
       await insforge.database.from('dogs').update({ verified: false }).eq('id', dogId)
     }
 
@@ -347,9 +358,8 @@ function ValidacionesTab({ onAction }: { onAction: () => void }) {
               </thead>
               <tbody className="divide-y divide-[#e4e2e1]">
                 {filtered.map(doc => (
-                  <>
+                  <React.Fragment key={doc.id}>
                     <tr
-                      key={doc.id}
                       className="hover:bg-[#f6f3f2] transition-colors cursor-pointer"
                       onClick={() => setExpanded(expanded === doc.id ? null : doc.id)}
                     >
@@ -376,7 +386,7 @@ function ValidacionesTab({ onAction }: { onAction: () => void }) {
                       </td>
                     </tr>
                     {expanded === doc.id && (
-                      <tr key={`${doc.id}-exp`}>
+                      <tr>
                         <td colSpan={5} className="bg-[#f0eded] px-5 py-4">
                           <div className="flex flex-col gap-4">
                             <div className="flex items-center gap-3 flex-wrap text-sm text-[#737973]">
@@ -435,7 +445,7 @@ function ValidacionesTab({ onAction }: { onAction: () => void }) {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
@@ -561,9 +571,8 @@ function PerfilesTab({ onAction }: { onAction: () => void }) {
             </thead>
             <tbody className="divide-y divide-[#e4e2e1]">
               {filtered.map(dog => (
-                <>
+                <React.Fragment key={dog.id}>
                   <tr
-                    key={dog.id}
                     className="hover:bg-[#f6f3f2] transition-colors cursor-pointer"
                     onClick={() => setExpanded(expanded === dog.id ? null : dog.id)}
                   >
@@ -642,7 +651,7 @@ function PerfilesTab({ onAction }: { onAction: () => void }) {
                     </td>
                   </tr>
                   {expanded === dog.id && (
-                    <tr key={`${dog.id}-exp`}>
+                    <tr>
                       <td colSpan={6} className="bg-[#f0eded] px-5 py-4">
                         <div className="flex flex-col gap-4">
                           {/* Photos row */}
@@ -683,7 +692,7 @@ function PerfilesTab({ onAction }: { onAction: () => void }) {
                       </td>
                     </tr>
                   )}
-                </>
+                </React.Fragment>
               ))}
             </tbody>
           </table>

@@ -22,6 +22,16 @@ export default function OnboardingDogPage() {
 
   const handlePhoto = (file: File) => {
     if (photos.length >= 6) return
+    const ALLOWED_IMAGE_MIME = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'])
+    if (!ALLOWED_IMAGE_MIME.has(file.type) && !file.type.startsWith('image/')) {
+      setError('Solo se permiten imágenes (JPG, PNG, WebP)')
+      return
+    }
+    if (file.size > 15 * 1024 * 1024) {
+      setError('La imagen supera 15 MB')
+      return
+    }
+    setError('')
     setPhotos(prev => [...prev, file])
     setPreviews(prev => [...prev, URL.createObjectURL(file)])
   }
