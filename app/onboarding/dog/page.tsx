@@ -46,35 +46,44 @@ export default function OnboardingDogPage() {
     if (!user) return
     setLoading(true); setError('')
 
-    // Ensure user row exists before inserting dog (FK constraint)
-    await (insforge.database.from('users').upsert({
-      id: user.id,
-      email: user.email ?? '',
-      name: user.profile?.name ?? user.user_metadata?.name ?? user.name ?? user.email?.split('@')[0] ?? '',
-    }, { onConflict: 'id' }) as any).catch(() => {})
+    try {
+      // Ensure user row exists (dogs.owner_id FK constraint)
+      try {
+        await insforge.database.from('users').upsert({
+          id: user.id,
+          email: user.email ?? '',
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          name: (user.profile?.name ?? (user as any).user_metadata?.name ?? user.name ?? user.email?.split('@')[0] ?? ''),
+        })
+      } catch {}
 
-    const photoUrls: string[] = []
-    for (const file of photos) {
-      const ext = file.name.split('.').pop()
-      const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-      const { data, error: uploadError } = await insforge.storage.from('dog-photos').upload(path, file)
-      if (uploadError || !data) { setError(uploadError?.message ?? 'Error al subir foto'); setLoading(false); return }
-      photoUrls.push(data.url)
+      const photoUrls: string[] = []
+      for (const file of photos) {
+        const ext = file.name.split('.').pop()
+        const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+        const { data, error: uploadError } = await insforge.storage.from('dog-photos').upload(path, file)
+        if (uploadError || !data) { setError(uploadError?.message ?? 'Error al subir foto'); setLoading(false); return }
+        photoUrls.push(data.url)
+      }
+
+      const { data: inserted, error: insertError } = await insforge.database.from('dogs').insert({
+        owner_id: user.id,
+        name: form.name,
+        breed: form.breed,
+        age: form.age,
+        sex: form.sex as 'Macho' | 'Hembra',
+        pedigree_number: form.pedigree || null,
+        zone: form.zone || null,
+        photos: photoUrls,
+      }).select('id').single()
+
+      if (insertError || !inserted) { setError(insertError?.message ?? 'Error al guardar'); setLoading(false); return }
+      router.push(`/documents?dog_id=${inserted.id}`)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Ocurrió un error. Intenta de nuevo.'
+      setError(msg)
+      setLoading(false)
     }
-
-    const { data: inserted, error: insertError } = await insforge.database.from('dogs').insert({
-      owner_id: user.id,
-      name: form.name,
-      breed: form.breed,
-      age: form.age,
-      sex: form.sex as 'Macho' | 'Hembra',
-      pedigree_number: form.pedigree || null,
-      zone: form.zone || null,
-      photos: photoUrls,
-    }).select('id').single()
-
-    if (insertError || !inserted) { setError(insertError?.message ?? 'Error al guardar'); setLoading(false); return }
-    router.push(`/documents?dog_id=${inserted.id}`)
   }
 
   return (
